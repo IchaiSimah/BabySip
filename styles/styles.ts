@@ -1555,15 +1555,16 @@ const componentStylesDefinition = {
 
   addBottleCustomAmountModalButtons: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    justifyContent: 'center',
     width: '100%',
+    gap: theme.spacing.lg,
   } as ViewStyle,
 
   addBottleCustomAmountModalButton: {
-    paddingHorizontal: theme.spacing.xl,
+    paddingHorizontal: theme.spacing.lg,
     paddingVertical: theme.spacing.sm,
     borderRadius: theme.borderRadius.xs,
-    minWidth: 80,
+    minWidth: 100,
     alignItems: 'center',
   } as ViewStyle,
 
@@ -1573,10 +1574,10 @@ const componentStylesDefinition = {
   } as TextStyle,
 
   addBottleCustomAmountModalConfirmButton: {
-    paddingHorizontal: theme.spacing.xl,
+    paddingHorizontal: theme.spacing.lg,
     paddingVertical: theme.spacing.sm,
     borderRadius: theme.borderRadius.xs,
-    minWidth: 80,
+    minWidth: 100,
     alignItems: 'center',
     backgroundColor: theme.colors.status.info,
   } as ViewStyle,

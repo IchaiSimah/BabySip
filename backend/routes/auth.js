@@ -21,7 +21,7 @@ router.post('/register', async (req, res) => {
 
     // Check if user already exists
     const existingUser = await executeQuery(
-      'SELECT id FROM users WHERE username = $1 OR email = $2',
+      'SELECT id FROM users WHERE username = ? OR email = ?',
       [username, email]
     );
 
@@ -36,9 +36,14 @@ router.post('/register', async (req, res) => {
     const passwordHash = await bcrypt.hash(password, saltRounds);
 
     // Create user
-    const newUser = await executeQuery(
-      'INSERT INTO users (username, email, password_hash) VALUES ($1, $2, $3) RETURNING id, username, email, created_at',
+    const insertResult = await executeQuery(
+      'INSERT INTO users (username, email, password_hash) VALUES (?, ?, ?)',
       [username, email, passwordHash]
+    );
+    const newUserId = insertResult.rows.insertId;
+    const newUser = await executeQuery(
+      'SELECT id, username, email, created_at FROM users WHERE id = ?',
+      [newUserId]
     );
 
     // Generate JWT token
@@ -87,8 +92,8 @@ router.post('/login', async (req, res) => {
 
     // Find user
     const user = await executeQuery(
-      'SELECT id, username, email, password_hash FROM users WHERE username = $1 OR email = $1',
-      [username]
+      'SELECT id, username, email, password_hash FROM users WHERE username = ? OR email = ?',
+      [username, username]
     );
 
     if (user.rows.length === 0) {
@@ -136,7 +141,7 @@ router.get('/profile', async (req, res) => {
     const decoded = jwt.verify(token, config.JWT_SECRET);
     
     const user = await executeQuery(
-      'SELECT id, username, email, created_at FROM users WHERE id = $1',
+      'SELECT id, username, email, created_at FROM users WHERE id = ?',
       [decoded.userId]
     );
 
@@ -174,7 +179,7 @@ router.post('/send-reset-code', async (req, res) => {
 
     // Find user by email
     const user = await executeQuery(
-      'SELECT id, email FROM users WHERE email = $1',
+      'SELECT id, email FROM users WHERE email = ?',
       [email]
     );
 
@@ -329,7 +334,7 @@ router.post('/reset-password', async (req, res) => {
 
     // Update password in database
     await executeQuery(
-      'UPDATE users SET password_hash = $1 WHERE email = $2',
+      'UPDATE users SET password_hash = ? WHERE email = ?',
       [passwordHash, email]
     );
 

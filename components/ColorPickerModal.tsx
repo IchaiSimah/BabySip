@@ -1,4 +1,5 @@
 import ColorService from '@/services/ColorService';
+import { useLanguage } from '@/utils/languageContext';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import { Dimensions, Modal, Text, TouchableOpacity, View } from 'react-native';
@@ -10,6 +11,7 @@ interface ColorPickerModalProps {
   visible: boolean;
   onClose: () => void;
   onColorSelect: (color: string) => void;
+  onColorPreview?: (color: string) => void; // Nouvelle prop pour la prévisualisation
   currentColor: string;
   type?: 'bottle' | 'poop';
 }
@@ -41,22 +43,29 @@ const poopPredefinedColors = [
 const { width: screenWidth } = Dimensions.get('window');
 const pickerSize = Math.min(screenWidth * 0.8, 300);
 
-export default function ColorPickerModal({ visible, onClose, onColorSelect, currentColor, type = 'bottle' }: ColorPickerModalProps) {
+export default function ColorPickerModal({ visible, onClose, onColorSelect, onColorPreview, currentColor, type = 'bottle' }: ColorPickerModalProps) {
+  const { t } = useLanguage();
   const [selectedColor, setSelectedColor] = useState(currentColor);
 
-  const handleColorSelect = (color: string) => {
+  const handleColorChange = (color: string) => {
     setSelectedColor(color);
-    // Call onColorSelect immediately to update color in parent
-    onColorSelect(color);
+    // Appeler onColorPreview pour la prévisualisation seulement
+    if (onColorPreview) {
+      onColorPreview(color);
+    }
   };
 
   const handleConfirm = () => {
+    // Confirmer la couleur sélectionnée
+    onColorSelect(selectedColor);
     onClose();
   };
 
   const handleCancel = () => {
-    // Remettre la couleur originale
-    onColorSelect(currentColor);
+    // Restaurer la couleur originale pour la prévisualisation
+    if (onColorPreview) {
+      onColorPreview(currentColor);
+    }
     setSelectedColor(currentColor);
     onClose();
   };
@@ -79,7 +88,7 @@ export default function ColorPickerModal({ visible, onClose, onColorSelect, curr
         <View style={styles.colorPickerModalContent}>
           {/* Header */}
           <View style={styles.colorPickerModalHeader}>
-            <Text style={styles.colorPickerModalTitle}>Choose Color</Text>
+            <Text style={styles.colorPickerModalTitle}>{type === 'bottle' ? t('chooseBottleColor') : t('choosePoopColor')}</Text>
             <TouchableOpacity onPress={handleCancel} style={styles.colorPickerModalCloseButton}>
               <Ionicons name="close" size={24} color={colors.text.primary} />
             </TouchableOpacity>
@@ -89,7 +98,7 @@ export default function ColorPickerModal({ visible, onClose, onColorSelect, curr
            <View style={styles.colorPickerModalPickerContainer}>
              <ColorPicker
                color={selectedColor}
-               onColorChange={handleColorSelect}
+               onColorChange={handleColorChange}
                row={false}
                noSnap={true}
                thumbSize={30}
@@ -102,10 +111,10 @@ export default function ColorPickerModal({ visible, onClose, onColorSelect, curr
           {/* Action Buttons */}
           <View style={styles.colorPickerModalButtonContainer}>
             <TouchableOpacity onPress={handleCancel} style={styles.colorPickerModalCancelButton}>
-              <Text style={styles.colorPickerModalCancelButtonText}>Cancel</Text>
+              <Text style={styles.colorPickerModalCancelButtonText}>{t('cancel')}</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={handleConfirm} style={styles.colorPickerModalConfirmButton}>
-              <Text style={styles.colorPickerModalConfirmButtonText}>Confirm</Text>
+              <Text style={styles.colorPickerModalConfirmButtonText}>{t('confirm')}</Text>
             </TouchableOpacity>
           </View>
         </View>

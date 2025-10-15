@@ -4,13 +4,13 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
-  ActivityIndicator,
-  Alert,
-  Dimensions,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    Alert,
+    Dimensions,
+    ScrollView,
+    Text,
+    TouchableOpacity,
+    View,
 } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
 
@@ -83,7 +83,7 @@ export default function StatisticsScreen() {
   const getChartData = () => {
     if (statsData.length === 0) {
       return {
-        labels: ['No Data'],
+        labels: [t('noData')],
         datasets: [{
           data: [0],
           color: (opacity = 1) => `rgba(99, 102, 241, ${opacity})`,
@@ -316,7 +316,7 @@ export default function StatisticsScreen() {
             <Ionicons name="alert-circle" size={48} color={colors.accent.error} />
             <Text style={styles.statisticsErrorText}>{error}</Text>
             <TouchableOpacity style={styles.statisticsRetryButton} onPress={loadStatsData}>
-              <Text style={styles.statisticsRetryButtonText}>Retry</Text>
+              <Text style={styles.statisticsRetryButtonText}>{t('retry')}</Text>
             </TouchableOpacity>
           </View>
         ) : (

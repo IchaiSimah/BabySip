@@ -5,7 +5,7 @@ module.exports = {
   PORT: process.env.PORT || 3000,
   NODE_ENV: process.env.NODE_ENV || 'development',
 
-  // Database Configuration (PostgreSQL)
+  // Database Configuration (MySQL)
   // Prefer DATABASE_URL; otherwise use individual parts. No hardcoded secrets.
   DATABASE_URL: process.env.DATABASE_URL,
   DB_HOST: process.env.DB_HOST,

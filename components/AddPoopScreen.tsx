@@ -47,6 +47,7 @@ export default function AddPoopScreen() {
   const [groupId, setGroupId] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [selectedColor, setSelectedColor] = useState('#8B4513'); // Default brown color for poop
+  const [previewColor, setPreviewColor] = useState('#8B4513'); // Couleur de prévisualisation temporaire
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [customColors, setCustomColors] = useState(poopPredefinedColors);
   const [selectedColorIndex, setSelectedColorIndex] = useState(0); // Index of the selected predefined color
@@ -70,6 +71,7 @@ export default function AddPoopScreen() {
       // Load default color
       const defaultColor = await ColorService.getDefaultPoopColor();
       setSelectedColor(defaultColor);
+      setPreviewColor(defaultColor); // Initialiser la couleur de prévisualisation
       
       // Load custom colors
       const savedCustomColors = await ColorService.getCustomPoopColors();
@@ -118,6 +120,7 @@ export default function AddPoopScreen() {
 
   const handleColorSelect = async (color: string) => {
     setSelectedColor(color);
+    setPreviewColor(color); // Mettre à jour la prévisualisation aussi
     
     // Update the selected predefined color
     const updatedColors = [...customColors];
@@ -129,8 +132,14 @@ export default function AddPoopScreen() {
     await ColorService.setDefaultPoopColor(color);
   };
 
+  const handleColorPreview = (color: string) => {
+    // Mettre à jour seulement la prévisualisation, pas la couleur sélectionnée
+    setPreviewColor(color);
+  };
+
   const handlePredefinedColorSelect = (color: string, index: number) => {
     setSelectedColor(color);
+    setPreviewColor(color); // Mettre à jour la prévisualisation aussi
     setSelectedColorIndex(index);
   };
 
@@ -193,7 +202,7 @@ export default function AddPoopScreen() {
             <Text style={[styles.modalAmountDisplayText, { color: colors.text.inverse }]}>
               {getRelativeDateString(selectedDateTime, language)}
             </Text>
-            <Text style={styles.addPoopTimeDisplayLabel}>Click to change</Text>
+            <Text style={styles.addPoopTimeDisplayLabel}>{t('clickToChange')}</Text>
           </TouchableOpacity>
           
           {showDatePicker && (
@@ -230,7 +239,7 @@ export default function AddPoopScreen() {
                   isNowSelected() && styles.modalSuggestionTextSelected,
                   isNowSelected() && { color: colors.text.inverse }
                 ]}>
-                  Now
+                  {t('now')}
                 </Text>
               </TouchableOpacity>
               {/* 4 previous quarter-hour buttons */}
@@ -270,7 +279,7 @@ export default function AddPoopScreen() {
               activeOpacity={0.7}
             >
               <Text style={[styles.modalAmountDisplayText, { color: colors.text.inverse }]}>{formatTime(selectedDateTime, language)}</Text>
-              <Text style={styles.addPoopTimeDisplayLabel}>Custom Time</Text>
+              <Text style={styles.addPoopTimeDisplayLabel}>{t('customTime')}</Text>
             </TouchableOpacity>
             {showTimePicker && (
               <DateTimePicker style={{ alignSelf: 'center' }}
@@ -298,7 +307,7 @@ export default function AddPoopScreen() {
               style={styles.modalInfoInput}
               value={poopInfo}
               onChangeText={setPoopInfo}
-              placeholder="Optional: Add any additional information..."
+              placeholder={t('poopInfoPlaceholder')}
               multiline={true}
               numberOfLines={3}
             />
@@ -308,7 +317,7 @@ export default function AddPoopScreen() {
         {/* Color Selection */}
         <View style={styles.section}>
           <View style={styles.card}>
-            <Text style={styles.sectionTitle}>Choose Poop Color</Text>
+            <Text style={styles.sectionTitle}>{t('choosePoopColor')}</Text>
             <View style={styles.modalSuggestionContainer}>
               {customColors.map((colorOption, idx) => (
                 <TouchableOpacity
@@ -336,12 +345,12 @@ export default function AddPoopScreen() {
               ))}
             </View>
             <TouchableOpacity
-              style={[styles.modalAmountDisplay, { marginTop: spacing.md, backgroundColor: selectedColor }]}
+              style={[styles.modalAmountDisplay, { marginTop: spacing.md, backgroundColor: previewColor }]}
               onPress={() => setShowColorPicker(true)}
               activeOpacity={0.7}
             >
-              <Text style={[styles.modalAmountDisplayText, { color: colors.text.inverse }]}>Selected Color</Text>
-              <Text style={styles.modalAmountDisplayLabel}>Tap to change</Text>
+              <Text style={[styles.modalAmountDisplayText, { color: colors.text.inverse }]}>{t('selectedColor')}</Text>
+              <Text style={styles.modalAmountDisplayLabel}>{t('tapToChange')}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -370,7 +379,7 @@ export default function AddPoopScreen() {
               ]}
             >
               {loading ? (
-                <Text style={styles.buttonText}>Adding...</Text>
+                <Text style={styles.buttonText}>{t('adding')}</Text>
               ) : (
                 <Text style={styles.buttonText}>{t('finish')}</Text>
               )}
@@ -384,6 +393,7 @@ export default function AddPoopScreen() {
         visible={showColorPicker}
         onClose={handleColorPickerClose}
         onColorSelect={handleColorSelect}
+        onColorPreview={handleColorPreview}
         currentColor={selectedColor}
         type="poop"
       />

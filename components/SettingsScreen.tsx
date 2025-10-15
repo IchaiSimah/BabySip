@@ -56,10 +56,9 @@ export default function SettingsScreen() {
   }, []);
 
   useEffect(() => {
-    if (groupId) {
-      loadDefaultBottleSetting();
-    }
-  }, [groupId]);
+    // Keep local display state in sync with persisted settings
+    setDefaultBottleAmount(dashboardSettings.lastBottleDefault);
+  }, [dashboardSettings.lastBottleDefault]);
 
   const initializeData = async () => {
     try {
@@ -83,18 +82,7 @@ export default function SettingsScreen() {
     }
   };
 
-  const loadDefaultBottleSetting = async () => {
-    if (!groupId) return;
-
-    try {
-      const currentSettings = await databaseService.getGroupSettings(1); // Use default group ID
-      if (currentSettings?.last_bottle) {
-        setDefaultBottleAmount(currentSettings.last_bottle);
-      }
-    } catch (error) {
-      console.error('Error loading default bottle setting:', error);
-    }
-  };
+  // Removed DB-based load; using SettingsContext persistence instead
 
   // Instant UI updates - no database calls needed
   const updateDashboardSetting = (key: string, value: number) => {
@@ -104,14 +92,8 @@ export default function SettingsScreen() {
   // Only persist the important setting
   const updateDefaultBottle = async (amount: number) => {
     setDefaultBottleAmount(amount);
-    if (groupId) {
-      try {
-        await databaseService.updateGroupSettings(1, { last_bottle: amount }); // Use default group ID
-      } catch (error) {
-        console.error('Error updating default bottle amount:', error);
-        Alert.alert(t('settingsError'), t('settingsErrorMessage'));
-      }
-    }
+    // Persist to AsyncStorage via SettingsContext
+    updateDashboardSettings({ lastBottleDefault: amount });
   };
 
   // Update increment/decrement logic for dashboard settings (instant updates)
@@ -261,12 +243,12 @@ export default function SettingsScreen() {
 
   const handleLogout = async () => {
     Alert.alert(
-      'Logout',
-      'Are you sure you want to logout?',
+      t('logout'),
+      t('confirmLogout'),
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: t('cancel'), style: 'cancel' },
         {
-          text: 'Logout',
+          text: t('logout'),
           style: 'destructive',
           onPress: async () => {
             try {
@@ -513,16 +495,16 @@ export default function SettingsScreen() {
             
               <View style={styles.settingsDebugInfo}>
                 <Text style={styles.settingsDebugText}>
-                  Current Dashboard Settings:
+                  t('dashboardSettings'):
                 </Text>
                 <Text style={styles.settingsDebugValue}>
-                  Bottles to Show: {dashboardSettings.bottlesToShow}
+                  t('bottlesToShow'): {dashboardSettings.bottlesToShow}
                 </Text>
                 <Text style={styles.settingsDebugValue}>
-                  Poops to Show: {dashboardSettings.poopsToShow}
+                  t('poopsToShow'): {dashboardSettings.poopsToShow}
                 </Text>
                 <Text style={styles.settingsDebugValue}>
-                  Default Bottle: {defaultBottleAmount}ml
+                  t('defaultBottleAmount'): {defaultBottleAmount}ml
                 </Text>
               </View>
               

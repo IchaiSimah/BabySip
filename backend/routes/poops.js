@@ -36,9 +36,13 @@ router.post('/', authenticateToken, async (req, res) => {
     }
 
     // Add poop with provided ID
-    const newPoop = await executeQuery(
-      'INSERT INTO poops (id, user_id, time, info, color) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+    await executeQuery(
+      'INSERT INTO poops (id, user_id, time, info, color) VALUES (?, ?, ?, ?, ?)',
       [id, userId, new Date(time), info || null, color || '#8B4513']
+    );
+    const newPoop = await executeQuery(
+      'SELECT * FROM poops WHERE id = ?',
+      [id]
     );
 
     res.status(201).json({
@@ -56,6 +60,8 @@ router.post('/', authenticateToken, async (req, res) => {
 router.get('/', authenticateToken, async (req, res) => {
   try {
     const { limit = 50, offset = 0, since } = req.query;
+    const limitNum = Math.max(0, Number.parseInt(limit));
+    const offsetNum = Math.max(0, Number.parseInt(offset));
     const userId = req.user.userId;
 
     // Build query with optional since parameter
@@ -63,32 +69,29 @@ router.get('/', authenticateToken, async (req, res) => {
       SELECT p.*, u.username as user_name
       FROM poops p
       JOIN users u ON p.user_id = u.id
-      WHERE p.user_id = $1
+      WHERE p.user_id = ?
     `;
     let params = [userId];
-    let paramIndex = 2;
 
     if (since) {
-      query += ` AND p.time >= $${paramIndex}`;
+      query += ` AND p.time >= ?`;
       params.push(since);
-      paramIndex++;
     }
 
     query += `
       ORDER BY p.time DESC
-      LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
+      LIMIT ${offsetNum}, ${limitNum}
     `;
-    params.push(parseInt(limit), parseInt(offset));
 
     // Get poops
     const poops = await executeQuery(query, params);
 
     // Get total count (with since filter if provided)
-    let countQuery = 'SELECT COUNT(*) as total FROM poops WHERE user_id = $1';
+    let countQuery = 'SELECT COUNT(*) as total FROM poops WHERE user_id = ?';
     let countParams = [userId];
     
     if (since) {
-      countQuery += ' AND time >= $2';
+      countQuery += ' AND time >= ?';
       countParams.push(since);
     }
     
@@ -117,8 +120,8 @@ router.get('/today', authenticateToken, async (req, res) => {
       SELECT p.*, u.username as user_name
       FROM poops p
       JOIN users u ON p.user_id = u.id
-      WHERE p.user_id = $1 
-      AND DATE(p.time) = CURRENT_DATE
+      WHERE p.user_id = ? 
+      AND DATE(p.time) = CURDATE()
       ORDER BY p.time DESC
     `, [userId]);
 
@@ -126,8 +129,8 @@ router.get('/today', authenticateToken, async (req, res) => {
     const countResult = await executeQuery(`
       SELECT COUNT(*) as count 
       FROM poops 
-      WHERE user_id = $1 
-      AND DATE(time) = CURRENT_DATE
+      WHERE user_id = ? 
+      AND DATE(time) = CURDATE()
     `, [userId]);
 
     res.json({
@@ -157,7 +160,7 @@ router.put('/:poopId', authenticateToken, async (req, res) => {
 
     // Check if poop exists and belongs to user
     const existingPoop = await executeQuery(
-      'SELECT * FROM poops WHERE id = $1 AND user_id = $2',
+      'SELECT * FROM poops WHERE id = ? AND user_id = ?',
       [poopId, userId]
     );
 
@@ -166,9 +169,13 @@ router.put('/:poopId', authenticateToken, async (req, res) => {
     }
 
     // Update poop
-    const updatedPoop = await executeQuery(
-      'UPDATE poops SET time = $1, info = $2, color = $3, updated_at = CURRENT_TIMESTAMP WHERE id = $4 RETURNING *',
+    await executeQuery(
+      'UPDATE poops SET time = ?, info = ?, color = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
       [new Date(time), info || null, color || '#8B4513', poopId]
+    );
+    const updatedPoop = await executeQuery(
+      'SELECT * FROM poops WHERE id = ?',
+      [poopId]
     );
 
     res.json({
@@ -190,7 +197,7 @@ router.delete('/:poopId', authenticateToken, async (req, res) => {
 
     // Check if poop exists and belongs to user
     const poop = await executeQuery(
-      'SELECT * FROM poops WHERE id = $1 AND user_id = $2',
+      'SELECT * FROM poops WHERE id = ? AND user_id = ?',
       [poopId, userId]
     );
 
@@ -199,7 +206,7 @@ router.delete('/:poopId', authenticateToken, async (req, res) => {
     }
 
     // Delete poop
-    await executeQuery('DELETE FROM poops WHERE id = $1', [poopId]);
+    await executeQuery('DELETE FROM poops WHERE id = ?', [poopId]);
 
     res.json({
       message: 'Poop deleted successfully'
@@ -220,16 +227,16 @@ router.get('/stats', authenticateToken, async (req, res) => {
     let dateFilter;
     switch (period) {
       case '7d':
-        dateFilter = 'AND p.time >= CURRENT_DATE - INTERVAL \'7 days\'';
+        dateFilter = 'AND p.time >= CURRENT_DATE - INTERVAL 7 DAY';
         break;
       case '30d':
-        dateFilter = 'AND p.time >= CURRENT_DATE - INTERVAL \'30 days\'';
+        dateFilter = 'AND p.time >= CURRENT_DATE - INTERVAL 30 DAY';
         break;
       case '90d':
-        dateFilter = 'AND p.time >= CURRENT_DATE - INTERVAL \'90 days\'';
+        dateFilter = 'AND p.time >= CURRENT_DATE - INTERVAL 90 DAY';
         break;
       default:
-        dateFilter = 'AND p.time >= CURRENT_DATE - INTERVAL \'7 days\'';
+        dateFilter = 'AND p.time >= CURRENT_DATE - INTERVAL 7 DAY';
     }
 
     // Get statistics
@@ -239,7 +246,7 @@ router.get('/stats', authenticateToken, async (req, res) => {
         COUNT(DISTINCT DATE(time)) as active_days,
         COUNT(DISTINCT user_id) as active_users
       FROM poops p
-      WHERE user_id = $1 ${dateFilter}
+      WHERE user_id = ? ${dateFilter}
     `, [userId]);
 
     // Get daily breakdown
@@ -248,7 +255,7 @@ router.get('/stats', authenticateToken, async (req, res) => {
         DATE(time) as date,
         COUNT(*) as poops_count
       FROM poops 
-      WHERE user_id = $1 ${dateFilter}
+      WHERE user_id = ? ${dateFilter}
       GROUP BY DATE(time)
       ORDER BY date DESC
     `, [userId]);

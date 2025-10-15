@@ -239,19 +239,6 @@ class DatabaseService {
     if (!this.db) return;
 
     const tables = [
-      `CREATE TABLE IF NOT EXISTS groups (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL,
-        users TEXT,
-        time_difference REAL DEFAULT 0,
-        last_bottle INTEGER DEFAULT 120,
-        bottles_to_show INTEGER DEFAULT 5,
-        poops_to_show INTEGER DEFAULT 1,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        description TEXT DEFAULT '',
-        is_shared INTEGER DEFAULT 0,
-        sync_status TEXT DEFAULT 'local'
-      )`,
       `CREATE TABLE IF NOT EXISTS entries (
         id TEXT PRIMARY KEY,
         group_id INTEGER DEFAULT 1,
@@ -316,8 +303,7 @@ class DatabaseService {
       // Migration 1: Add color field to existing entries table
       await this.migrateAddColorField();
       
-      // Migration 2: Add sync fields to groups table
-      await this.migrateAddGroupSyncFields();
+      // Removed group-related migrations
       
       // Migration 3: Add sync fields to entries table
       await this.migrateAddEntriesSyncFields();
@@ -325,8 +311,7 @@ class DatabaseService {
       // Migration 4: Add sync fields to poop table
       await this.migrateAddPoopSyncFields();
       
-      // Migration 5: Remove group_id constraints and foreign keys
-      await this.migrateRemoveGroupConstraints();
+      // Keep entries/poop migrations only
       
       // Migration 6: Add color field to poop table
       await this.migrateAddPoopColorField();
@@ -359,35 +344,7 @@ class DatabaseService {
     }
   }
 
-  private async migrateAddGroupSyncFields(): Promise<void> {
-    if (!this.db) return;
-
-    try {
-      const tableInfo = await this.db.getAllAsync("PRAGMA table_info(groups)");
-      const hasDescription = tableInfo.some((column: any) => column.name === 'description');
-      const hasIsShared = tableInfo.some((column: any) => column.name === 'is_shared');
-      const hasSyncStatus = tableInfo.some((column: any) => column.name === 'sync_status');
-      
-      if (!hasDescription) {
-        console.log('🔄 [MIGRATION] Adding description field to groups table...');
-        await this.db.execAsync("ALTER TABLE groups ADD COLUMN description TEXT DEFAULT ''");
-      }
-      
-      if (!hasIsShared) {
-        console.log('🔄 [MIGRATION] Adding is_shared field to groups table...');
-        await this.db.execAsync("ALTER TABLE groups ADD COLUMN is_shared INTEGER DEFAULT 0");
-      }
-      
-      if (!hasSyncStatus) {
-        console.log('🔄 [MIGRATION] Adding sync_status field to groups table...');
-        await this.db.execAsync("ALTER TABLE groups ADD COLUMN sync_status TEXT DEFAULT 'local'");
-      }
-      
-      console.log('✅ [MIGRATION] Group sync fields migration completed');
-    } catch (error) {
-      console.error('❌ [MIGRATION] Error adding group sync fields:', error);
-    }
-  }
+  // Removed migrateAddGroupSyncFields (groups table is deprecated)
 
   private async migrateAddEntriesSyncFields(): Promise<void> {
     if (!this.db) return;
@@ -449,104 +406,7 @@ class DatabaseService {
     }
   }
 
-  private async migrateRemoveGroupConstraints(): Promise<void> {
-    if (!this.db) return;
-
-    try {
-      console.log('🔄 [MIGRATION] Checking if group constraints migration is needed...');
-      
-      // Check if the migration is already done by looking for the color column in poop table
-      const tableInfo = await this.db.getAllAsync("PRAGMA table_info(poop)");
-      const hasColorColumn = tableInfo.some((column: any) => column.name === 'color');
-      
-      if (hasColorColumn) {
-        console.log('✅ [MIGRATION] Group constraints migration already completed, skipping...');
-        return;
-      }
-      
-      console.log('🔄 [MIGRATION] Starting group constraints migration...');
-      
-      // Drop foreign key constraints
-      await this.db.execAsync("PRAGMA foreign_keys=OFF");
-      
-      // Recreate entries table without group_id NOT NULL constraint
-      await this.db.execAsync(`
-        CREATE TABLE entries_new (
-          id TEXT PRIMARY KEY,
-          group_id INTEGER DEFAULT 1,
-          amount INTEGER NOT NULL,
-          time DATETIME NOT NULL,
-          color TEXT DEFAULT '#6366F1',
-          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-          sync_status TEXT DEFAULT 'pending'
-        )
-      `);
-      
-      // Copy data from old table to new table
-      await this.db.execAsync(`
-        INSERT INTO entries_new (id, group_id, amount, time, color, created_at, sync_status)
-        SELECT id, group_id, amount, time, color, created_at, sync_status FROM entries
-      `);
-      
-      // Drop old table and rename new table
-      await this.db.execAsync("DROP TABLE entries");
-      await this.db.execAsync("ALTER TABLE entries_new RENAME TO entries");
-      
-      // Recreate poop table without group_id NOT NULL constraint
-      await this.db.execAsync(`
-        CREATE TABLE poop_new (
-          id TEXT PRIMARY KEY,
-          group_id INTEGER DEFAULT 1,
-          time DATETIME NOT NULL,
-          info TEXT,
-          color TEXT DEFAULT '#8B4513',
-          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-          sync_status TEXT DEFAULT 'pending'
-        )
-      `);
-      
-      // Copy data from old table to new table
-      await this.db.execAsync(`
-        INSERT INTO poop_new (id, group_id, time, info, color, created_at, sync_status)
-        SELECT id, group_id, time, info, COALESCE(color, '#8B4513'), created_at, sync_status FROM poop
-      `);
-      
-      // Drop old table and rename new table
-      await this.db.execAsync("DROP TABLE poop");
-      await this.db.execAsync("ALTER TABLE poop_new RENAME TO poop");
-      
-      // Recreate user_messages table without group_id NOT NULL constraint
-      await this.db.execAsync(`
-        CREATE TABLE user_messages_new (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          group_id INTEGER DEFAULT 1,
-          user_id INTEGER NOT NULL,
-          main_message_id INTEGER,
-          main_chat_id INTEGER,
-          created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-        )
-      `);
-      
-      // Copy data from old table to new table
-      await this.db.execAsync(`
-        INSERT INTO user_messages_new (id, group_id, user_id, main_message_id, main_chat_id, created_at)
-        SELECT id, group_id, user_id, main_message_id, main_chat_id, created_at FROM user_messages
-      `);
-      
-      // Drop old table and rename new table
-      await this.db.execAsync("DROP TABLE user_messages");
-      await this.db.execAsync("ALTER TABLE user_messages_new RENAME TO user_messages");
-      
-      // Re-enable foreign keys
-      await this.db.execAsync("PRAGMA foreign_keys=ON");
-      
-      console.log('✅ [MIGRATION] Group constraints removed successfully');
-    } catch (error) {
-      console.error('❌ [MIGRATION] Error removing group constraints:', error);
-      // Re-enable foreign keys in case of error
-      await this.db.execAsync("PRAGMA foreign_keys=ON");
-    }
-  }
+  // Removed migrateRemoveGroupConstraints (group constraints deprecated)
   // --- Language Management ---
   async getUserLanguage(userId: number): Promise<string> {
     if (!await this.initDatabase() || !this.db) return 'en';
@@ -899,43 +759,7 @@ class DatabaseService {
     }
   }
 
-  async updateGroupSettings(groupId: number, settings: Partial<GroupSettings>): Promise<boolean> {
-    if (!await this.initDatabase() || !this.db) return false;
 
-    try {
-      const updates: string[] = [];
-      const values: any[] = [];
-      
-      if (settings.bottles_to_show !== undefined) {
-        updates.push('bottles_to_show = ?');
-        values.push(settings.bottles_to_show);
-      }
-      if (settings.poops_to_show !== undefined) {
-        updates.push('poops_to_show = ?');
-        values.push(settings.poops_to_show);
-      }
-      if (settings.last_bottle !== undefined) {
-        updates.push('last_bottle = ?');
-        values.push(settings.last_bottle);
-      }
-      if (settings.time_difference !== undefined) {
-        updates.push('time_difference = ?');
-        values.push(settings.time_difference);
-      }
-      
-      if (updates.length === 0) return true;
-      
-      values.push(groupId);
-      await executeQuery(this.db,
-        `UPDATE groups SET ${updates.join(', ')} WHERE id = ?`,
-        values
-      );
-      return true;
-    } catch (error) {
-      console.error('Error updating group settings:', error);
-      return false;
-    }
-  }
 
   // --- Statistics ---
   async getTodayBottles(): Promise<Entry[]> {

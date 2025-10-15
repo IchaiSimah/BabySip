@@ -36,9 +36,13 @@ router.post('/', authenticateToken, async (req, res) => {
     }
 
     // Add bottle with provided ID
-    const newBottle = await executeQuery(
-      'INSERT INTO bottles (id, user_id, amount, time, color) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+    await executeQuery(
+      'INSERT INTO bottles (id, user_id, amount, time, color) VALUES (?, ?, ?, ?, ?)',
       [id, userId, amount, new Date(time), color || '#6366F1']
+    );
+    const newBottle = await executeQuery(
+      'SELECT * FROM bottles WHERE id = ?',
+      [id]
     );
 
     res.status(201).json({
@@ -56,6 +60,8 @@ router.post('/', authenticateToken, async (req, res) => {
 router.get('/', authenticateToken, async (req, res) => {
   try {
     const { limit = 50, offset = 0, since } = req.query;
+    const limitNum = Math.max(0, Number.parseInt(limit));
+    const offsetNum = Math.max(0, Number.parseInt(offset));
     const userId = req.user.userId;
 
     // Build query with optional since parameter
@@ -63,32 +69,29 @@ router.get('/', authenticateToken, async (req, res) => {
       SELECT b.*, u.username as user_name
       FROM bottles b
       JOIN users u ON b.user_id = u.id
-      WHERE b.user_id = $1
+      WHERE b.user_id = ?
     `;
     let params = [userId];
-    let paramIndex = 2;
 
     if (since) {
-      query += ` AND b.time >= $${paramIndex}`;
+      query += ` AND b.time >= ?`;
       params.push(since);
-      paramIndex++;
     }
 
     query += `
       ORDER BY b.time DESC
-      LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
+      LIMIT ${offsetNum}, ${limitNum}
     `;
-    params.push(parseInt(limit), parseInt(offset));
 
     // Get bottles
     const bottles = await executeQuery(query, params);
 
     // Get total count (with since filter if provided)
-    let countQuery = 'SELECT COUNT(*) as total FROM bottles WHERE user_id = $1';
+    let countQuery = 'SELECT COUNT(*) as total FROM bottles WHERE user_id = ?';
     let countParams = [userId];
     
     if (since) {
-      countQuery += ' AND time >= $2';
+      countQuery += ' AND time >= ?';
       countParams.push(since);
     }
     
@@ -117,8 +120,8 @@ router.get('/today', authenticateToken, async (req, res) => {
       SELECT b.*, u.username as user_name
       FROM bottles b
       JOIN users u ON b.user_id = u.id
-      WHERE b.user_id = $1 
-      AND DATE(b.time) = CURRENT_DATE
+      WHERE b.user_id = ? 
+      AND DATE(b.time) = CURDATE()
       ORDER BY b.time DESC
     `, [userId]);
 
@@ -146,7 +149,7 @@ router.put('/:bottleId', authenticateToken, async (req, res) => {
 
     // Check if bottle exists and belongs to user
     const bottle = await executeQuery(
-      'SELECT * FROM bottles WHERE id = $1 AND user_id = $2',
+      'SELECT * FROM bottles WHERE id = ? AND user_id = ?',
       [bottleId, userId]
     );
 
@@ -155,9 +158,13 @@ router.put('/:bottleId', authenticateToken, async (req, res) => {
     }
 
     // Update bottle
-    const updatedBottle = await executeQuery(
-      'UPDATE bottles SET amount = $1, time = $2, color = $3, updated_at = CURRENT_TIMESTAMP WHERE id = $4 RETURNING *',
+    await executeQuery(
+      'UPDATE bottles SET amount = ?, time = ?, color = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
       [amount, new Date(time), color, bottleId]
+    );
+    const updatedBottle = await executeQuery(
+      'SELECT * FROM bottles WHERE id = ?',
+      [bottleId]
     );
 
     res.json({
@@ -179,7 +186,7 @@ router.delete('/:bottleId', authenticateToken, async (req, res) => {
 
     // Check if bottle exists and belongs to user
     const bottle = await executeQuery(
-      'SELECT * FROM bottles WHERE id = $1 AND user_id = $2',
+      'SELECT * FROM bottles WHERE id = ? AND user_id = ?',
       [bottleId, userId]
     );
 
@@ -188,7 +195,7 @@ router.delete('/:bottleId', authenticateToken, async (req, res) => {
     }
 
     // Delete bottle
-    await executeQuery('DELETE FROM bottles WHERE id = $1', [bottleId]);
+    await executeQuery('DELETE FROM bottles WHERE id = ?', [bottleId]);
 
     res.json({
       message: 'Bottle deleted successfully'
@@ -212,22 +219,22 @@ router.get('/stats', authenticateToken, async (req, res) => {
 
     switch (period) {
       case '24h':
-        dateFilter = 'AND b.time >= NOW() - INTERVAL \'24 hours\'';
+        dateFilter = 'AND b.time >= NOW() - INTERVAL 24 HOUR';
         groupByClause = 'b.time'; // Individual bottles, not grouped
         orderByClause = 'ORDER BY time_period ASC';
         break;
       case '7d':
-        dateFilter = 'AND b.time >= NOW() - INTERVAL \'7 days\'';
+        dateFilter = 'AND b.time >= NOW() - INTERVAL 7 DAY';
         groupByClause = 'DATE(b.time)';
         orderByClause = 'ORDER BY time_period ASC';
         break;
       case '30d':
-        dateFilter = 'AND b.time >= NOW() - INTERVAL \'30 days\'';
+        dateFilter = 'AND b.time >= NOW() - INTERVAL 30 DAY';
         groupByClause = 'DATE(b.time)';
         orderByClause = 'ORDER BY time_period ASC';
         break;
       default:
-        dateFilter = 'AND b.time >= NOW() - INTERVAL \'24 hours\'';
+        dateFilter = 'AND b.time >= NOW() - INTERVAL 24 HOUR';
         groupByClause = 'b.time'; // Individual bottles, not grouped
         orderByClause = 'ORDER BY time_period ASC';
     }
@@ -243,7 +250,7 @@ router.get('/stats', authenticateToken, async (req, res) => {
           b.amount as total_amount,
           b.amount as average_amount
         FROM bottles b
-        WHERE b.user_id = $1 ${dateFilter}
+        WHERE b.user_id = ? ${dateFilter}
         ORDER BY b.time ASC
       `, [userId]);
     } else {
@@ -255,7 +262,7 @@ router.get('/stats', authenticateToken, async (req, res) => {
           SUM(amount) as total_amount,
           AVG(amount) as average_amount
         FROM bottles b
-        WHERE b.user_id = $1 ${dateFilter}
+        WHERE b.user_id = ? ${dateFilter}
         GROUP BY ${groupByClause}
         ${orderByClause}
       `, [userId]);
@@ -281,7 +288,7 @@ router.get('/group/:groupId/stats', authenticateToken, async (req, res) => {
 
     // Check if user is member of this group
     const membership = await executeQuery(
-      'SELECT role FROM group_members WHERE group_id = $1 AND user_id = $2',
+      'SELECT role FROM group_members WHERE group_id = ? AND user_id = ?',
       [groupId, userId]
     );
 
@@ -292,16 +299,16 @@ router.get('/group/:groupId/stats', authenticateToken, async (req, res) => {
     let dateFilter;
     switch (period) {
       case '7d':
-        dateFilter = 'AND b.time >= CURRENT_DATE - INTERVAL \'7 days\'';
+        dateFilter = 'AND b.time >= CURRENT_DATE - INTERVAL 7 DAY';
         break;
       case '30d':
-        dateFilter = 'AND b.time >= CURRENT_DATE - INTERVAL \'30 days\'';
+        dateFilter = 'AND b.time >= CURRENT_DATE - INTERVAL 30 DAY';
         break;
       case '90d':
-        dateFilter = 'AND b.time >= CURRENT_DATE - INTERVAL \'90 days\'';
+        dateFilter = 'AND b.time >= CURRENT_DATE - INTERVAL 90 DAY';
         break;
       default:
-        dateFilter = 'AND b.time >= CURRENT_DATE - INTERVAL \'7 days\'';
+        dateFilter = 'AND b.time >= CURRENT_DATE - INTERVAL 7 DAY';
     }
 
     // Get statistics
@@ -313,7 +320,7 @@ router.get('/group/:groupId/stats', authenticateToken, async (req, res) => {
         COUNT(DISTINCT DATE(time)) as active_days,
         COUNT(DISTINCT user_id) as active_users
       FROM bottles b
-      WHERE group_id = $1 ${dateFilter}
+      WHERE group_id = ? ${dateFilter}
     `, [groupId]);
 
     // Get daily breakdown
@@ -323,7 +330,7 @@ router.get('/group/:groupId/stats', authenticateToken, async (req, res) => {
         COUNT(*) as bottles_count,
         SUM(amount) as total_amount
       FROM bottles 
-      WHERE group_id = $1 ${dateFilter}
+      WHERE group_id = ? ${dateFilter}
       GROUP BY DATE(time)
       ORDER BY date DESC
     `, [groupId]);

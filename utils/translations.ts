@@ -45,7 +45,6 @@ export const translations = {
     settingsError: 'Settings Error',
     settingsErrorMessage: 'Failed to save settings. Please try again.',
     settingsInfo: 'Changes are applied immediately and will affect how data is displayed on the dashboard.',
-    
     // Authentication
     fillAllFields: 'Please fill in all fields',
     loginSuccess: 'Login Successful',
@@ -63,7 +62,7 @@ export const translations = {
     login: 'Login',
     forgotPassword: 'Forgot password?',
     noAccount: 'No account yet? Sign up',
-    
+    confirmLogout: 'Are you sure you want to logout?',
     // Registration
     usernameRequired: 'Username is required',
     usernameMinLength: 'Username must contain at least 3 characters',
@@ -157,6 +156,7 @@ export const translations = {
     addBottleError: 'Error adding bottle',
     bottleAddedSuccess: 'Bottle added!',
     invalidAmountTitle: 'Invalid Amount',
+    invalidAmountDescription: 'Please enter a valid amount (between 1 and 1000 ml)',
     confirmDeletionTitle: 'Confirm Deletion',
     confirmBottleDeletion: 'Are you sure you want to delete this bottle?',
     bottleDeletedSuccess: 'Bottle deleted successfully',
@@ -215,6 +215,39 @@ export const translations = {
     english: 'English',
     french: 'Français',
     hebrew: 'עברית',
+
+    // Common UI
+    ok: 'OK',
+    loading: 'Loading...',
+    loadingSettings: 'Loading settings...',
+    retry: 'Retry',
+    now: 'Now',
+
+    customTime: 'Custom Time',
+    customAmountLabel: 'Custom Amount',
+    customAmountPrompt: 'Enter amount (ml):',
+    chooseBottleColor: 'Choose Bottle Color',
+    choosePoopColor: 'Choose Poop Color',
+    selectedColor: 'Selected Color',
+    tapToChange: 'Tap to change',
+    adding: 'Adding...',
+    amountMlLabel: 'Amount (ml)',
+    enterAmountPlaceholder: 'Enter amount',
+    timeLabelStandalone: 'Time',
+    saveChanges: 'Save Changes',
+    saving: 'Saving...',
+    debugInfo: 'Debug Info',
+    resetDashboardSettings: 'Reset Dashboard Settings',
+    cleanRetrieve: '🧹 Clean and retrieve from cloud',
+    deleteAllTablesDebug: '🗑️ Delete ALL tables (DEBUG)',
+    success: 'Success',
+    errorGeneric: 'Error',
+    edit: 'Edit',
+    delete: 'Delete',
+    logout: 'Logout',
+    reset: 'Reset',
+    poopInfoPlaceholder: 'Optional: Add any additional information...',
+    editBottle: 'Edit Bottle',
     
   },
   fr: {
@@ -263,7 +296,7 @@ export const translations = {
     settingsError: 'Erreur de Paramètres',
     settingsErrorMessage: 'Échec de la sauvegarde des paramètres. Veuillez réessayer.',
     settingsInfo: 'Les modifications sont appliquées immédiatement et affecteront l\'affichage des données sur le tableau de bord.',
-    
+
     // Authentication
     fillAllFields: 'Veuillez remplir tous les champs',
     loginSuccess: 'Connexion réussie',
@@ -281,6 +314,7 @@ export const translations = {
     login: 'Se connecter',
     forgotPassword: 'Mot de passe oublié ?',
     noAccount: 'Pas encore de compte ? S\'inscrire',
+    confirmLogout: 'Êtes-vous sûr de vouloir vous déconnecter ?',
     
     // Registration
     usernameRequired: 'Le nom d\'utilisateur est requis',
@@ -375,6 +409,7 @@ export const translations = {
     addBottleError: 'Erreur lors de l\'ajout du biberon',
     bottleAddedSuccess: 'Biberon ajouté !',
     invalidAmountTitle: 'Quantité invalide',
+    invalidAmountDescription: 'Veuillez entrer une quantité valide (entre 1 et 1000 ml)',
     confirmDeletionTitle: 'Confirmer la suppression',
     confirmBottleDeletion: 'Êtes-vous sûr de vouloir supprimer ce biberon ?',
     bottleDeletedSuccess: 'Biberon supprimé avec succès',
@@ -413,6 +448,38 @@ export const translations = {
     english: 'English',
     french: 'Français',
     hebrew: 'עברית',
+
+    // Common UI
+    ok: 'OK',
+    loading: 'Chargement...',
+    loadingSettings: 'Chargement des paramètres...',
+    retry: 'Réessayer',
+    now: 'Maintenant',
+
+    customTime: 'Heure personnalisée',
+    customAmountLabel: 'Quantité personnalisée',
+    customAmountPrompt: 'Entrez la quantité (ml):',
+    chooseBottleColor: 'Choisir la couleur du biberon',
+    choosePoopColor: 'Choisir la couleur du caca',
+    selectedColor: 'Couleur sélectionnée',
+    tapToChange: 'Appuyer pour changer',
+    adding: 'Ajout en cours...',
+    amountMlLabel: 'Quantité (ml)',
+    enterAmountPlaceholder: 'Entrez la quantité',
+    timeLabelStandalone: 'Heure',
+    saveChanges: 'Enregistrer',
+    saving: 'Enregistrement...',
+    debugInfo: 'Infos de débogage',
+    resetDashboardSettings: 'Réinitialiser les paramètres du tableau de bord',
+    cleanRetrieve: '🧹 Nettoyer et récupérer du cloud',
+    deleteAllTablesDebug: '🗑️ Supprimer TOUTES les tables (DEBUG)',
+    success: 'Succès',
+    errorGeneric: 'Erreur',
+    edit: 'Modifier',
+    delete: 'Supprimer',
+    logout: 'Se déconnecter',
+    reset: 'Réinitialiser',
+    poopInfoPlaceholder: 'Optionnel : Ajoutez des informations supplémentaires...',
     
     // Statistics Labels
     bottlesLabel: 'Biberons',
@@ -432,6 +499,7 @@ export const translations = {
     detailedData: 'Données détaillées',
     hourlyConsumption: 'Consommation horaire',
     dailyConsumption: 'Consommation quotidienne',
+    editBottle: 'modifier biberon'
     
   },
   he: {
@@ -481,7 +549,7 @@ export const translations = {
     settingsError: 'שגיאת הגדרות',
     settingsErrorMessage: 'שגיאה בשמירת ההגדרות. אנא נסה שוב.',
     settingsInfo: 'השינויים מיושמים מיד וישפיעו על אופן הצגת הנתונים בלוח הבקרה.',
-    
+
     // Authentication
     fillAllFields: 'אנא מלא את כל השדות',
     loginSuccess: 'התחברות הצליחה',
@@ -499,7 +567,7 @@ export const translations = {
     login: 'התחבר',
     forgotPassword: 'שכחת סיסמה?',
     noAccount: 'אין לך חשבון עדיין? הירשם',
-    
+    confirmLogout: ' אתה בטוח שברצונך להתנתק?',      
     // Registration
     usernameRequired: 'שם המשתמש נדרש',
     usernameMinLength: 'שם המשתמש חייב להכיל לפחות 3 תווים',
@@ -593,6 +661,7 @@ export const translations = {
     addBottleError: 'שגיאה בהוספת בקבוק',
     bottleAddedSuccess: 'הבקבוק נוסף!',
     invalidAmountTitle: 'כמות לא תקינה',
+    invalidAmountDescription: 'אנא הכנס כמות תקינה (בין 1 ל-1000 מ"ל)',
     confirmDeletionTitle: 'אשר מחיקה',
     confirmBottleDeletion: 'האם אתה בטוח שברצונך למחוק את הבקבוק הזה?',
     bottleDeletedSuccess: 'הבקבוק נמחק בהצלחה',
@@ -632,6 +701,38 @@ export const translations = {
     english: 'English',
     french: 'Français',
     hebrew: 'עברית',
+
+    // Common UI
+    ok: 'אישור',
+    loading: 'טוען...',
+    loadingSettings: 'טוען הגדרות...',
+    retry: 'נסה שוב',
+    now: 'עכשיו',
+ 
+    customTime: 'בחר שעה',
+    customAmountLabel: 'כמות מותאמת אישית',
+    customAmountPrompt: 'הכנס כמות (מ"ל):',
+    chooseBottleColor: 'בחר צבע לבקבוק',
+    choosePoopColor: 'בחר צבע לקקי',
+    selectedColor: 'צבע נבחר',
+    tapToChange: 'הקש כדי לשנות',
+    adding: 'מוסיף...',
+    amountMlLabel: 'כמות (מ"ל)',
+    enterAmountPlaceholder: 'הכנס כמות',
+    timeLabelStandalone: 'זמן',
+    saveChanges: 'שמור שינויים',
+    saving: 'שומר...',
+    debugInfo: 'מידע לניפוי',
+    resetDashboardSettings: 'אפס הגדרות לוח הבקרה',
+    cleanRetrieve: '🧹 נקה וקבל מהענן',
+    deleteAllTablesDebug: '🗑️ מחק את כל הטבלאות (DEBUG)',
+    success: 'הצלחה',
+    errorGeneric: 'שגיאה',
+    edit: 'ערוך',
+    delete: 'מחיקה',
+    logout: 'התנתקות',
+    reset: 'איפוס',
+    poopInfoPlaceholder: 'אופציונלי: הוסף מידע נוסף...',
     
     // Statistics Labels
     bottlesLabel: 'בקבוקים',
@@ -651,6 +752,7 @@ export const translations = {
     detailedData: 'נתונים מפורטים',
     hourlyConsumption: 'צריכה שעתית',
     dailyConsumption: 'צריכה יומית',
+    editBottle: 'ערוך בקבוק'
   },
 };
 

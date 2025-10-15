@@ -218,11 +218,6 @@ export default function DashboardScreen() {
       const userLanguage = await databaseService.getUserLanguage(userId);
       // Language is now managed by global context, no need to set it here
       
-      // Load the important setting that affects bottle suggestions
-      const groupSettings = await databaseService.getGroupSettings(1); // Use default group ID
-      if (groupSettings?.last_bottle) {
-        setLastBottleAmount(groupSettings.last_bottle);
-      }
 
       // SIMPLE: Check AsyncStorage directly and sync only if needed
       const hasDoneInitialSync = await AsyncStorage.getItem('hasInitialSync');
@@ -333,16 +328,15 @@ export default function DashboardScreen() {
 
   const handleLogout = async () => {
       Alert.alert(
-        'Logout',
-        'Are you sure you want to logout?',
+        t('logout'),
+        t('confirmLogout'),
         [
-          { text: 'Cancel', style: 'cancel' },
+          { text: t('cancel'), style: 'cancel' },
           {
-            text: 'Logout',
+            text: t('logout'),
             style: 'destructive',
           onPress: async () => {
             try {
-              // 🔥 NEW: Reset initial sync flag on logout
               setHasInitialSync(false);
               await authService.logout();
               // AuthGuard will automatically redirect to login when authState changes
@@ -364,11 +358,11 @@ export default function DashboardScreen() {
   const handleDeleteBottle = async (bottle: Bottle) => {
     Alert.alert(
       t('confirmDeletion'),
-      `Are you sure you want to delete this ${bottle.amount}ml bottle?`,
+      t('confirmBottleDeletion'),
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: t('cancel'), style: 'cancel' },
         {
-          text: 'Delete',
+          text: t('delete'),
           style: 'destructive',
           onPress: async () => {
             try {
@@ -624,20 +618,20 @@ export default function DashboardScreen() {
                     onDelete={() => {
                       Alert.alert(
                         t('confirmDeletion'),
-                        `Are you sure you want to delete this poop at ${formatTime(poopTime, language)}?`,
+                        t('confirmPoopDeletion'),
                         [
-                          { text: 'Cancel', style: 'cancel' },
+                          { text: t('cancel'), style: 'cancel' },
                           {
-                            text: 'Delete',
+                            text: t('delete'),
                             style: 'destructive',
                             onPress: async () => {
                               try {
                                 const success = await databaseService.deletePoopHybrid(poop.id);
                                 if (success) {
                                   await loadData();
-                                  Alert.alert('Success', 'Poop deleted successfully');
+                                  Alert.alert('Success', t('poopDeletedSuccess'));
                                 } else {
-                                  Alert.alert('Error', 'Failed to delete poop');
+                                  Alert.alert('Error', t('poopDeleteError'));
                                 }
                               } catch (error) {
                                 console.error('Error deleting poop:', error);

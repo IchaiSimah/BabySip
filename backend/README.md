@@ -6,7 +6,7 @@ Backend API for the BBT (Baby Bottle Tracker) application with shared groups fun
 
 ### Prerequisites
 - Node.js (v14 or higher)
-- PostgreSQL (v12 or higher)
+- MySQL (v8.0 or higher)
 
 ### Installation
 
@@ -16,7 +16,7 @@ Backend API for the BBT (Baby Bottle Tracker) application with shared groups fun
    ```
 
 2. **Configure database:**
-   - Create a PostgreSQL database named `bbt_app`
+   - Create a MySQL database named `bbt_app`
    - Update database credentials in `config.js` or set environment variables
 
 3. **Start the server:**
@@ -181,7 +181,7 @@ Authorization: Bearer <jwt_token>
 ## 🗄️ Database Schema
 
 ### Users
-- `id` (SERIAL PRIMARY KEY)
+- `id` (INT AUTO_INCREMENT PRIMARY KEY)
 - `username` (VARCHAR(50) UNIQUE)
 - `email` (VARCHAR(100) UNIQUE)
 - `password_hash` (VARCHAR(255))
@@ -189,7 +189,7 @@ Authorization: Bearer <jwt_token>
 - `updated_at` (TIMESTAMP)
 
 ### Groups
-- `id` (SERIAL PRIMARY KEY)
+- `id` (INT AUTO_INCREMENT PRIMARY KEY)
 - `name` (VARCHAR(100))
 - `description` (TEXT)
 - `owner_id` (INTEGER REFERENCES users(id))
@@ -198,14 +198,13 @@ Authorization: Bearer <jwt_token>
 - `updated_at` (TIMESTAMP)
 
 ### Group Members
-- `id` (SERIAL PRIMARY KEY)
+- `id` (INT AUTO_INCREMENT PRIMARY KEY)
 - `group_id` (INTEGER REFERENCES groups(id))
 - `user_id` (INTEGER REFERENCES users(id))
 - `role` (VARCHAR(20)) - 'owner', 'admin', 'member'
 - `joined_at` (TIMESTAMP)
 
-### Bottles
-- `id` (SERIAL PRIMARY KEY)
+- `id` (VARCHAR(64) PRIMARY KEY)
 - `group_id` (INTEGER REFERENCES groups(id))
 - `user_id` (INTEGER REFERENCES users(id))
 - `amount` (INTEGER)
@@ -214,8 +213,7 @@ Authorization: Bearer <jwt_token>
 - `created_at` (TIMESTAMP)
 - `updated_at` (TIMESTAMP)
 
-### Poops
-- `id` (SERIAL PRIMARY KEY)
+- `id` (VARCHAR(64) PRIMARY KEY)
 - `group_id` (INTEGER REFERENCES groups(id))
 - `user_id` (INTEGER REFERENCES users(id))
 - `time` (TIMESTAMP)
@@ -231,9 +229,9 @@ Update `config.js` or set environment variables:
 {
   PORT: 3000,
   DB_HOST: 'localhost',
-  DB_PORT: 5432,
+  DB_PORT: 3306,
   DB_NAME: 'bbt_app',
-  DB_USER: 'postgres',
+  DB_USER: 'root',
   DB_PASSWORD: 'your_password',
   JWT_SECRET: 'your-super-secret-jwt-key',
   JWT_EXPIRES_IN: '7d'
@@ -259,3 +257,4 @@ GET /
 - Group owners have full control over their groups
 - Bottle colors are stored as hex values (e.g., "#FF6B6B")
 - Statistics support 7d, 30d, and 90d periods 
+- Backend now uses `mysql2` instead of `pg`; placeholders are `?`, and `RETURNING` is replaced by follow-up `SELECT`

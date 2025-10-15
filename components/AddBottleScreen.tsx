@@ -2,6 +2,7 @@ import ColorService, { predefinedColors } from '@/services/ColorService';
 import databaseService from '@/services/DatabaseService';
 import { adjustDateForTimeLogic, formatTime, getRelativeDateString } from '@/utils/dateUtils';
 import { useLanguage } from '@/utils/languageContext';
+import { useSettings } from '@/utils/settingsContext';
 import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { router } from 'expo-router';
@@ -44,6 +45,7 @@ function generateAmountSuggestions(lastBottle: number) {
 
 export default function AddBottleScreen() {
   const { t, language } = useLanguage();
+  const { dashboardSettings } = useSettings();
   const [selectedDateTime, setSelectedDateTime] = useState(roundToNearestQuarter(new Date()));
   const [selectedAmount, setSelectedAmount] = useState(120);
   const [showAmountInput, setShowAmountInput] = useState(false);
@@ -55,6 +57,7 @@ export default function AddBottleScreen() {
   const [lastBottle, setLastBottle] = useState(120);
   const [loading, setLoading] = useState(false);
   const [selectedColor, setSelectedColor] = useState('#6366F1'); // Default to current blue color
+  const [previewColor, setPreviewColor] = useState('#6366F1'); // Couleur de prévisualisation temporaire
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [customColors, setCustomColors] = useState(predefinedColors);
   const [selectedColorIndex, setSelectedColorIndex] = useState(1); // Index of the selected predefined color
@@ -75,15 +78,16 @@ export default function AddBottleScreen() {
       // Language is managed by useLanguage context, no need to set it here
       
       const finalGroupId = groupId || currentGroupId!;
-      const settings = await databaseService.getGroupSettings(1); // Use default group ID
-      if (settings && settings.last_bottle > 20) {
-        setLastBottle(settings.last_bottle);
-        setSelectedAmount(settings.last_bottle);
+      // Use persisted settings from AsyncStorage (via SettingsContext)
+      if (dashboardSettings.lastBottleDefault > 20) {
+        setLastBottle(dashboardSettings.lastBottleDefault);
+        setSelectedAmount(dashboardSettings.lastBottleDefault);
       }
       
       // Load default color
       const defaultColor = await ColorService.getDefaultBottleColor();
       setSelectedColor(defaultColor);
+      setPreviewColor(defaultColor); // Initialiser la couleur de prévisualisation
       
       // Load custom colors
       const savedCustomColors = await ColorService.getCustomBottleColors();
@@ -107,6 +111,7 @@ export default function AddBottleScreen() {
 
   const handleColorSelect = async (color: string) => {
     setSelectedColor(color);
+    setPreviewColor(color); // Mettre à jour la prévisualisation aussi
     
     // Update the selected predefined color
     const updatedColors = [...customColors];
@@ -118,8 +123,14 @@ export default function AddBottleScreen() {
     await ColorService.setDefaultBottleColor(color);
   };
 
+  const handleColorPreview = (color: string) => {
+    // Mettre à jour seulement la prévisualisation, pas la couleur sélectionnée
+    setPreviewColor(color);
+  };
+
   const handlePredefinedColorSelect = (color: string, index: number) => {
     setSelectedColor(color);
+    setPreviewColor(color); // Mettre à jour la prévisualisation aussi
     setSelectedColorIndex(index);
   };
 
@@ -134,7 +145,7 @@ export default function AddBottleScreen() {
       setCustomAmount('');
       setShowAmountInput(false);
     } else {
-      Alert.alert('Invalid Amount', 'Please enter a valid amount between 1 and 1000 ml');
+      Alert.alert(t('invalidAmountTitle'), t('invalidAmountDescription'));
     }
   };
 
@@ -198,25 +209,7 @@ export default function AddBottleScreen() {
 
   const amountSuggestions = generateAmountSuggestions(lastBottle);
 
-  // Add inline translations as fallback for modal and buttons
-  const translations = {
-    en: {
-      customAmount: 'Enter amount (ml):',
-      cancel: 'Cancel',
-      finish: 'Finish',
-    },
-    fr: {
-      customAmount: 'Entrez la quantité (ml):',
-      cancel: 'Annuler',
-      finish: 'Terminer',
-    },
-    he: {
-      customAmount: 'הכנס כמות (מ"ל):',
-      cancel: 'בטל',
-      finish: 'סיים',
-    },
-  };
-  const tInline = translations[language] || translations['en'];
+  // Use centralized translations
 
   return (
     <View style={styles.container}>
@@ -246,7 +239,7 @@ export default function AddBottleScreen() {
             <Text style={[styles.modalAmountDisplayText, { color: colors.text.inverse }]}>
               {getRelativeDateString(selectedDateTime, language)}
             </Text>
-            <Text style={styles.modalAmountDisplayLabel}>Click to change</Text>
+            <Text style={styles.modalAmountDisplayLabel}>{t('tapToChange')}</Text>
           </TouchableOpacity>
           
           {showDatePicker && (
@@ -283,7 +276,7 @@ export default function AddBottleScreen() {
                   isNowSelected() && styles.modalSuggestionTextSelected,
                   isNowSelected() && { color: colors.text.inverse }
                 ]}>
-                  Now
+                  {t('now')}
                 </Text>
               </TouchableOpacity>
               {/* 4 previous quarter-hour buttons */}
@@ -321,7 +314,7 @@ export default function AddBottleScreen() {
               activeOpacity={0.7}
             >
               <Text style={[styles.modalAmountDisplayText, { color: colors.text.inverse }]}>{formatTime(selectedDateTime, language)}</Text>
-              <Text style={styles.modalAmountDisplayLabel}>Custom Time</Text>
+              <Text style={styles.modalAmountDisplayLabel}>{t('customTime')}</Text>
             </TouchableOpacity>
             {showTimePicker && (
               <DateTimePicker style={{ alignSelf: 'center' }}
@@ -371,7 +364,7 @@ export default function AddBottleScreen() {
               activeOpacity={0.7}
             >
               <Text style={styles.modalAmountDisplayText}>{selectedAmount}ml</Text>
-              <Text style={styles.modalAmountDisplayLabel}>Custom Amount</Text>
+              <Text style={styles.modalAmountDisplayLabel}>{t('customAmountLabel')}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -379,7 +372,7 @@ export default function AddBottleScreen() {
         {/* Color Selection */}
         <View style={styles.section}>
           <View style={styles.card}>
-            <Text style={styles.sectionTitle}>Choose Bottle Color</Text>
+            <Text style={styles.sectionTitle}>{t('chooseBottleColor')}</Text>
             <View style={styles.modalSuggestionContainer}>
               {customColors.map((colorOption, idx) => (
                 <TouchableOpacity
@@ -407,12 +400,12 @@ export default function AddBottleScreen() {
               ))}
             </View>
             <TouchableOpacity
-              style={[styles.modalAmountDisplay, { marginTop: spacing.md, backgroundColor: selectedColor }]}
+              style={[styles.modalAmountDisplay, { marginTop: spacing.md, backgroundColor: previewColor }]}
               onPress={() => setShowColorPicker(true)}
               activeOpacity={0.7}
             >
-              <Text style={[styles.modalAmountDisplayText, { color: colors.text.inverse }]}>Selected Color</Text>
-              <Text style={styles.modalAmountDisplayLabel}>Tap to change</Text>
+              <Text style={[styles.modalAmountDisplayText, { color: colors.text.inverse }]}>{t('selectedColor')}</Text>
+              <Text style={styles.modalAmountDisplayLabel}>{t('tapToChange')}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -441,7 +434,7 @@ export default function AddBottleScreen() {
               ]}
             >
               {loading ? (
-                <Text style={styles.buttonText}>Adding...</Text>
+                <Text style={styles.buttonText}>{t('adding')}</Text>
               ) : (
                 <Text style={styles.buttonText}>{t('finish')}</Text>
               )}
@@ -458,7 +451,7 @@ export default function AddBottleScreen() {
       >
         <View style={styles.addBottleCustomAmountModalOverlay}>
           <View style={styles.addBottleCustomAmountModalContent}>
-            <Text style={styles.addBottleCustomAmountModalTitle}>{tInline.customAmount}</Text>
+            <Text style={styles.addBottleCustomAmountModalTitle}>{t('customAmountPrompt')}</Text>
             <TextInput
               style={styles.addBottleCustomAmountModalInput}
               value={customAmount}
@@ -472,13 +465,13 @@ export default function AddBottleScreen() {
                 style={styles.addBottleCustomAmountModalButton}
                 onPress={() => setShowAmountInput(false)}
               >
-                <Text style={styles.addBottleCustomAmountModalButtonText}>{tInline.cancel}</Text>
+                <Text style={styles.addBottleCustomAmountModalButtonText}>{t('cancel')}</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.addBottleCustomAmountModalConfirmButton}
                 onPress={confirmCustomAmount}
               >
-                <Text style={styles.addBottleCustomAmountModalConfirmButtonText}>{tInline.finish}</Text>
+                <Text style={styles.addBottleCustomAmountModalConfirmButtonText}>{t('finish')}</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -490,6 +483,7 @@ export default function AddBottleScreen() {
         visible={showColorPicker}
         onClose={handleColorPickerClose}
         onColorSelect={handleColorSelect}
+        onColorPreview={handleColorPreview}
         currentColor={selectedColor}
         type="bottle"
       />
