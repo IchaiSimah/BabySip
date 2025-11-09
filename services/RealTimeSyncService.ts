@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { API_CONFIG } from '../constants/config';
 import apiService from './ApiService';
 
 // --- Real-Time Message Types ---
@@ -95,8 +96,9 @@ class RealTimeSyncService {
       // 🔥 FIXED: Use persistent device ID instead of generating new one each time
       const deviceId = await this.getDeviceId();
       this.sessionDeviceId = deviceId; // 🔥 CRITICAL FIX: Assign session device ID
-      const wsUrl = `ws://10.100.102.97:3000?token=${authToken}&userId=${userId}&deviceId=${deviceId}`;
-      console.log('🔗 [REAL-TIME] Connecting to:', wsUrl);
+      // Use environment-based WebSocket URL from config
+      const wsUrl = `${API_CONFIG.WS_URL}?token=${authToken}&userId=${userId}&deviceId=${deviceId}`;
+      console.log('🔗 [REAL-TIME] Connecting to:', wsUrl.replace(/token=[^&]+/, 'token=***'));
 
       this.ws = new WebSocket(wsUrl);
       

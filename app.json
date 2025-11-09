@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "BabySip",
-    "slug": "BabySip",
+    "slug": "BBT-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -45,7 +45,9 @@
       "router": {},
       "eas": {
         "projectId": "5b18ee54-7744-45d0-a099-da65a04b07ac"
-      }
+      },
+      "env": "development",
+      "apiUrl": null
     }
   }
 }

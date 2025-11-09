@@ -189,10 +189,15 @@ app.get('/health', async (req, res) => {
 
 // Start server
 server.listen(PORT, '0.0.0.0', () => {
+  const host = process.env.HOST || 'localhost';
+  const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http';
+  const wsProtocol = process.env.NODE_ENV === 'production' ? 'wss' : 'ws';
+  
   console.log(`BBT Backend server running on port ${PORT}`);
-  console.log(`API available at http://10.100.102.97:${PORT}`);
-  console.log(`WebSocket available at ws://10.100.102.97:${PORT}`);
-  console.log(`Health check at http://10.100.102.97:${PORT}/health`);
+  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`API available at ${protocol}://${host}:${PORT}`);
+  console.log(`WebSocket available at ${wsProtocol}://${host}:${PORT}`);
+  console.log(`Health check at ${protocol}://${host}:${PORT}/health`);
 });
 
 module.exports = app; 
