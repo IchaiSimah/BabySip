@@ -4,6 +4,7 @@ export const translations = {
     lastBottles: 'Last bottles:',
     noBottles: 'No bottles recorded yet',
     lastPoops: 'Last poop:',
+    noPoops: 'No poops recorded yet',
     addBottle: 'Add Bottle',
     addPoop: 'Add Poop',
     
@@ -212,9 +213,9 @@ export const translations = {
     languageSettings: 'Language Settings',
     selectLanguage: 'Select Language',
     languageDescription: 'Choose your preferred language for the application interface.',
-    english: 'English',
-    french: 'Français',
-    hebrew: 'עברית',
+    English: 'English',
+    French: 'French',
+    Hebrew: 'Hebrew',
 
     // Common UI
     ok: 'OK',
@@ -245,6 +246,7 @@ export const translations = {
     edit: 'Edit',
     delete: 'Delete',
     logout: 'Logout',
+    accountSettings: 'Account',
     reset: 'Reset',
     poopInfoPlaceholder: 'Optional: Add any additional information...',
     editBottle: 'Edit Bottle',
@@ -255,6 +257,7 @@ export const translations = {
     lastBottles: 'Derniers biberons:',
     noBottles: 'Aucun biberon enregistré pour le moment',
     lastPoops: 'Dernier caca:',
+    noPoops: 'Aucun caca enregistré pour le moment',
     addBottle: 'Biberon',
     addPoop: 'Caca',
     
@@ -287,7 +290,7 @@ export const translations = {
     bottlesToShow: 'Biberons à Afficher',
     bottlesToShowDescription: 'Nombre maximum de biberons affichés sur le tableau de bord',
     poopsToShow: 'Cacas à Afficher',
-    poopsToShowDescription: 'Nombre maximum de changements de couche affichés sur le tableau de bord',
+    poopsToShowDescription: 'Nombre maximum de changements de couches affichés sur le tableau de bord',
     bottleSettings: 'Paramètres des Biberons',
     defaultBottleAmount: 'Quantité par Défaut',
     defaultBottleAmountDescription: 'Quantité suggérée par défaut lors de l\'ajout d\'un nouveau biberon',
@@ -445,9 +448,9 @@ export const translations = {
     languageSettings: 'Paramètres de Langue',
     selectLanguage: 'Sélectionner la Langue',
     languageDescription: 'Choisissez votre langue préférée pour l\'interface de l\'application.',
-    english: 'English',
-    french: 'Français',
-    hebrew: 'עברית',
+    English: 'Anglais',
+    French: 'Français',
+    Hebrew: 'Hebreu',
 
     // Common UI
     ok: 'OK',
@@ -478,6 +481,7 @@ export const translations = {
     edit: 'Modifier',
     delete: 'Supprimer',
     logout: 'Se déconnecter',
+    accountSettings: 'Compte',
     reset: 'Réinitialiser',
     poopInfoPlaceholder: 'Optionnel : Ajoutez des informations supplémentaires...',
     
@@ -485,7 +489,7 @@ export const translations = {
     bottlesLabel: 'Biberons',
     totalLabel: 'Total',
     averageLabel: 'Moyenne',
-    changesLabel: 'Changements',
+    changesLabel: 'Couches',
     
     // Statistics Screen
     statisticsTitle: 'Statistiques',
@@ -507,6 +511,7 @@ export const translations = {
     lastBottles: 'בקבוקים אחרונים:',
     noBottles: 'אין בקבוקים רשומים כרגע',
     lastPoops: 'החלפת חיתול אחרונה:',
+    noPoops: 'אין החלפות חיתול רשומות כרגע',
     addBottle: 'בקבוק',
     addPoop: 'קקי',
     
@@ -698,9 +703,9 @@ export const translations = {
     languageSettings: 'הגדרות שפה',
     selectLanguage: 'בחר שפה',
     languageDescription: 'בחר את השפה המועדפת שלך לממשק האפליקציה.',
-    english: 'English',
-    french: 'Français',
-    hebrew: 'עברית',
+    English: 'אנגלית',
+    French: 'צרפתית',
+    Hebrew: 'עברית',
 
     // Common UI
     ok: 'אישור',
@@ -731,6 +736,7 @@ export const translations = {
     edit: 'ערוך',
     delete: 'מחיקה',
     logout: 'התנתקות',
+    accountSettings: 'חשבון',
     reset: 'איפוס',
     poopInfoPlaceholder: 'אופציונלי: הוסף מידע נוסף...',
     

@@ -67,6 +67,12 @@ export const dataChangeEmitter = new EventEmitter();
 // 🔥 NEW: Helper function to send real-time messages
 const sendRealTimeMessage = async (type: RealTimeMessage['type'], data: any, groupId: number) => {
   try {
+    // 🔥 FIXED: Check if WebSocket is connected before trying to send
+    if (!realTimeSyncService.isConnected()) {
+      console.log('ℹ️ [REAL-TIME] WebSocket not connected yet, skipping message (will sync via normal sync)');
+      return;
+    }
+
     // Get current user ID
     const user = await apiService.getProfile();
     
@@ -83,9 +89,9 @@ const sendRealTimeMessage = async (type: RealTimeMessage['type'], data: any, gro
     };
     
     realTimeSyncService.sendMessage(message);
-    console.log('Sent SYNC_REQUESTED message with device ID:', deviceId);
+    console.log('📡 [REAL-TIME] Sent SYNC_REQUESTED message with device ID:', deviceId);
   } catch (error) {
-    console.error('Failed to send message:', error);
+    console.error('❌ [REAL-TIME] Failed to send message:', error);
   }
 };
 
@@ -844,10 +850,10 @@ class DatabaseService {
       
       console.log('🔄 [HYBRID] Retrieved bottle ID for sync:', bottleId);
       
-      // 2. Add to sync queue for background cloud sync
+      // 2. Add to sync queue for background cloud sync (always, even offline)
       const syncService = getSyncService();
-      if (syncService?.isOnline()) {
-        console.log('🔄 [HYBRID] Adding bottle to sync queue...');
+      
+      if (syncService) {
         await syncService.addToSyncQueue({
           type: 'bottle',
           action: 'create',
@@ -858,15 +864,17 @@ class DatabaseService {
             color,
           }
         });
-        
-        // 3. Start background sync (non-blocking)
+      }
+
+      if (syncService && syncService.isOnline()) {
+        // 3. Start background sync (non-blocking) - only if online
         syncService.sync().then(() => {
           console.log('✅ [HYBRID] Background sync completed successfully');
         }).catch((error) => {
           console.error('❌ [HYBRID] Background sync failed:', error);
         });
         
-        // 4. Send WebSocket message for real-time sync with other devices
+        // 4. Send WebSocket message for real-time sync with other devices - only if online
         sendRealTimeMessage('SYNC_REQUESTED', { 
           type: 'bottles',
           timestamp: Date.now()
@@ -875,7 +883,7 @@ class DatabaseService {
         }).catch((error) => {
           console.error('❌ [HYBRID] WebSocket message failed:', error);
         });
-        } else {
+      } else {
         console.log('📱 [HYBRID] Offline - bottle queued for later sync');
       }
       
@@ -907,10 +915,10 @@ class DatabaseService {
       
       console.log('🔄 [HYBRID] Retrieved poop ID for sync:', poopId);
       
-      // 2. Add to sync queue for background cloud sync
+      // 2. Add to sync queue for background cloud sync (always, even offline)
       const syncService = getSyncService();
-      if (syncService?.isOnline()) {
-        console.log('🔄 [HYBRID] Adding poop to sync queue...');
+      
+      if (syncService) {
         await syncService.addToSyncQueue({
           type: 'poop',
           action: 'create',
@@ -921,15 +929,17 @@ class DatabaseService {
             color,
           }
         });
-        
-        // 3. Start background sync (non-blocking)
+      }
+
+      if (syncService && syncService.isOnline()) {
+        // 3. Start background sync (non-blocking) - only if online
         syncService.sync().then(() => {
           console.log('✅ [HYBRID] Background sync completed successfully');
         }).catch((error) => {
           console.error('❌ [HYBRID] Background sync failed:', error);
         });
         
-        // 4. Send WebSocket message for real-time sync with other devices
+        // 4. Send WebSocket message for real-time sync with other devices - only if online
         sendRealTimeMessage('SYNC_REQUESTED', { 
           type: 'poops',
           timestamp: Date.now()
@@ -938,7 +948,7 @@ class DatabaseService {
         }).catch((error) => {
           console.error('❌ [HYBRID] WebSocket message failed:', error);
         });
-        } else {
+      } else {
         console.log('📱 [HYBRID] Offline - poop queued for later sync');
       }
       
@@ -965,29 +975,31 @@ class DatabaseService {
 
       console.log('✅ [HYBRID] Bottle updated locally, starting background sync...');
       
-      // 2. Add to sync queue for background cloud sync
+      // 2. Add to sync queue for background cloud sync (always, even offline)
       const syncService = getSyncService();
-      if (syncService?.isOnline()) {
-        console.log('🔄 [HYBRID] Adding bottle update to sync queue...');
+      
+      if (syncService) {
         await syncService.addToSyncQueue({
           type: 'bottle',
-        action: 'update',
-        data: {
+          action: 'update',
+          data: {
             id: bottleId,
             amount,
-          time: time.toISOString(),
+            time: time.toISOString(),
             color,
           }
         });
-        
-        // 3. Start background sync (non-blocking)
+      }
+
+      if (syncService && syncService.isOnline()) {
+        // 3. Start background sync (non-blocking) - only if online
         syncService.sync().then(() => {
           console.log('✅ [HYBRID] Background sync completed successfully');
         }).catch((error) => {
           console.error('❌ [HYBRID] Background sync failed:', error);
         });
         
-        // 4. Send WebSocket message for real-time sync with other devices
+        // 4. Send WebSocket message for real-time sync with other devices - only if online
         sendRealTimeMessage('SYNC_REQUESTED', { 
           type: 'bottles',
           timestamp: Date.now()
@@ -1023,10 +1035,10 @@ class DatabaseService {
 
       console.log('✅ [HYBRID] Poop updated locally, starting background sync...');
       
-      // 2. Add to sync queue for background cloud sync
-        const syncService = getSyncService();
-      if (syncService?.isOnline()) {
-        console.log('🔄 [HYBRID] Adding poop update to sync queue...');
+      // 2. Add to sync queue for background cloud sync (always, even offline)
+      const syncService = getSyncService();
+      
+      if (syncService) {
         await syncService.addToSyncQueue({
           type: 'poop',
           action: 'update',
@@ -1036,15 +1048,17 @@ class DatabaseService {
             info,
           }
         });
-        
-        // 3. Start background sync (non-blocking)
+      }
+
+      if (syncService && syncService.isOnline()) {
+        // 3. Start background sync (non-blocking) - only if online
         syncService.sync().then(() => {
           console.log('✅ [HYBRID] Background sync completed successfully');
         }).catch((error) => {
           console.error('❌ [HYBRID] Background sync failed:', error);
         });
         
-        // 4. Send WebSocket message for real-time sync with other devices
+        // 4. Send WebSocket message for real-time sync with other devices - only if online
         sendRealTimeMessage('SYNC_REQUESTED', { 
           id: poopId,
           type: 'poops',
@@ -1081,24 +1095,26 @@ class DatabaseService {
 
       console.log('✅ [HYBRID] Bottle deleted locally, starting background sync...');
       
-      // 2. Add to sync queue for background cloud sync
-        const syncService = getSyncService();
-      if (syncService?.isOnline()) {
-        console.log('🔄 [HYBRID] Adding bottle delete to sync queue...');
+      // 2. Add to sync queue for background cloud sync (always, even offline)
+      const syncService = getSyncService();
+      
+      if (syncService) {
         await syncService.addToSyncQueue({
           type: 'bottle',
           action: 'delete',
           data: { id: bottleId }
         });
-        
-        // 3. Start background sync (non-blocking)
+      }
+
+      if (syncService && syncService.isOnline()) {
+        // 3. Start background sync (non-blocking) - only if online
         syncService.sync().then(() => {
           console.log('✅ [HYBRID] Background sync completed successfully');
         }).catch((error) => {
           console.error('❌ [HYBRID] Background sync failed:', error);
         });
         
-        // 4. Send WebSocket message for real-time sync with other devices
+        // 4. Send WebSocket message for real-time sync with other devices - only if online
         sendRealTimeMessage('SYNC_REQUESTED', { 
           type: 'bottles',
           timestamp: Date.now()
@@ -1134,24 +1150,26 @@ class DatabaseService {
 
       console.log('✅ [HYBRID] Poop deleted locally, starting background sync...');
       
-      // 2. Add to sync queue for background cloud sync
-        const syncService = getSyncService();
-      if (syncService?.isOnline()) {
-        console.log('🔄 [HYBRID] Adding poop delete to sync queue...');
+      // 2. Add to sync queue for background cloud sync (always, even offline)
+      const syncService = getSyncService();
+      
+      if (syncService) {
         await syncService.addToSyncQueue({
           type: 'poop',
           action: 'delete',
           data: { id: poopId }
         });
-        
-        // 3. Start background sync (non-blocking)
+      }
+
+      if (syncService && syncService.isOnline()) {
+        // 3. Start background sync (non-blocking) - only if online
         syncService.sync().then(() => {
           console.log('✅ [HYBRID] Background sync completed successfully');
         }).catch((error) => {
           console.error('❌ [HYBRID] Background sync failed:', error);
         });
         
-        // 4. Send WebSocket message for real-time sync with other devices
+        // 4. Send WebSocket message for real-time sync with other devices - only if online
         sendRealTimeMessage('SYNC_REQUESTED', { 
           type: 'poops',
           timestamp: Date.now()
@@ -1301,9 +1319,10 @@ class DatabaseService {
     if (!await this.initDatabase() || !this.db) return;
 
     try {
-      // Get all local bottles (only synced ones, not pending ones)
+      // 🔥 FIXED: Get ALL local bottles (not just synced ones) to detect deletions
+      // This ensures that even pending bottles that were deleted on another device are removed
       const localBottles = await getAllRows(this.db,
-        `SELECT id FROM entries WHERE sync_status = 'synced'`
+        `SELECT id FROM entries`
       );
 
       // Create a set of cloud bottle IDs for fast lookup

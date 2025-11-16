@@ -544,9 +544,9 @@ export default function SettingsScreen() {
               onPress={handleLogout}
               style={styles.settingsLogoutButton}
             >
-              <Ionicons name="log-out" size={20} color={colors.text.inverse} style={{ marginRight: spacing.sm }} />
+              <Ionicons name="log-out" size={20} color={colors.status.error} style={{ marginRight: spacing.sm }} />
               <Text style={styles.settingsLogoutButtonText}>
-                Logout
+                {t('logout')}
               </Text>
             </TouchableOpacity>
           </View>

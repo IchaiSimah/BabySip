@@ -106,6 +106,12 @@ class SyncService {
     this.syncStatus.isOnline = netInfo.isConnected ?? false;
     this.notifyListeners();
 
+    // 🔥 CRITICAL FIX: If we're already online at startup and have pending items, sync them
+    if (this.syncStatus.isOnline && this.syncQueue.length > 0) {
+      console.log(`🔄 [SYNC] Starting sync for ${this.syncQueue.length} pending items at startup`);
+      this.sync();
+    }
+
     // 🔥 NEW: Remove periodic sync - now using real-time events
     // this.startPeriodicSync();
   }

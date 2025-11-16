@@ -8,10 +8,11 @@ import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
 import { router } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
+  Animated,
   RefreshControl,
   ScrollView,
   Text,
@@ -82,6 +83,10 @@ export default function DashboardScreen() {
   const [syncStatus, setSyncStatus] = useState<string>('idle');
   const [hasInitialSync, setHasInitialSync] = useState(false); // 🔥 SIMPLE: false = not synced yet, true = synced
   const [isInitializing, setIsInitializing] = useState(false); // 🔥 NEW: Prevent multiple initializations
+
+  // Animation for first bottle swipe hint
+  const firstBottleAnimation = useRef(new Animated.Value(0)).current;
+  const [hasShownHint, setHasShownHint] = useState(false);
 
   // DEBUG: Function to reset initial sync status (for testing)
   const resetInitialSyncStatus = async () => {
@@ -314,6 +319,48 @@ export default function DashboardScreen() {
     setRefreshing(false);
   };
 
+  // Reset animation hint when screen comes into focus
+  useFocusEffect(
+    React.useCallback(() => {
+      setHasShownHint(false);
+      firstBottleAnimation.setValue(0);
+    }, [])
+  );
+
+  // Animation hint for first bottle swipe
+  useEffect(() => {
+    if (recentBottles.length > 0 && !hasShownHint && !loading) {
+      // Wait a bit before starting animation
+      const timer = setTimeout(() => {
+        // Animate: subtle movement to hint swipe capability
+        Animated.sequence([
+          Animated.timing(firstBottleAnimation, {
+            toValue: -6,
+            duration: 500,
+            useNativeDriver: true,
+          }),
+          Animated.timing(firstBottleAnimation, {
+            toValue: 0,
+            duration: 500,
+            useNativeDriver: true,
+          }),
+          Animated.timing(firstBottleAnimation, {
+            toValue: -4,
+            duration: 450,
+            useNativeDriver: true,
+          }),
+          Animated.timing(firstBottleAnimation, {
+            toValue: 0,
+            duration: 450,
+            useNativeDriver: true,
+          }),
+        ]).start();
+        setHasShownHint(true);
+      }, 200);
+      return () => clearTimeout(timer);
+    }
+  }, [recentBottles.length, loading, hasShownHint]);
+
   const handleAddBottle = () => {
     router.push('/add-bottle');
   };
@@ -424,8 +471,13 @@ export default function DashboardScreen() {
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.dashboardHeaderRow}>
-            <TouchableOpacity onPress={handleSettings}>
-              <Logo size={48} style={styles.dashboardLogoContainer} />
+            <TouchableOpacity onPress={handleSettings} style={styles.dashboardLogoButton}>
+              <View style={styles.dashboardLogoWrapper}>
+                <Logo size={48} style={styles.dashboardLogoContainer} />
+                <View style={styles.dashboardSettingsIndicator}>
+                  <Ionicons name="settings" size={14} color={colors.primary.main} />
+                </View>
+              </View>
             </TouchableOpacity>
             {/* Loading spinner */}
             {loading && (
@@ -434,7 +486,7 @@ export default function DashboardScreen() {
               </View>
             )}
             <View style={styles.dashboardTitleContainer}>
-              <Text style={[styles.appTitle, { marginBottom: spacing.md }]}>BabySip</Text>
+              <Text style={[styles.appTitle]}>BabySip</Text>
             </View>
             <TouchableOpacity
               onPress={() => router.push('/stats')}
@@ -560,17 +612,23 @@ export default function DashboardScreen() {
             {recentBottles.length > 0 ? (
               recentBottles.map((bottle, index) => {
                 const bottleTime = new Date(bottle.time);
+                const isFirstBottle = index === 0;
                 return (
-                  <SwipeableItem
+                  <Animated.View
                     key={bottle.id}
-                    onEdit={() => handleEditBottle(bottle)}
-                    onDelete={() => handleDeleteBottle(bottle)}
-                    editLabel="Edit"
-                    deleteLabel="Delete"
-                    editColor={colors.primary.main}
-                    deleteColor={colors.status.error}
+                    style={isFirstBottle ? {
+                      transform: [{ translateX: firstBottleAnimation }]
+                    } : undefined}
                   >
-                    <View style={styles.listItem}>
+                    <SwipeableItem
+                      onEdit={() => handleEditBottle(bottle)}
+                      onDelete={() => handleDeleteBottle(bottle)}
+                      editLabel="Edit"
+                      deleteLabel="Delete"
+                      editColor={colors.primary.main}
+                      deleteColor={colors.status.error}
+                    >
+                      <View style={styles.listItem}>
                       <View style={styles.dashboardListItem}>
                         <Text style={styles.listItemText}>
                           {bottle.amount}ml
@@ -585,6 +643,7 @@ export default function DashboardScreen() {
                       ]} />
                     </View>
                   </SwipeableItem>
+                  </Animated.View>
                 );
               })
             ) : (
@@ -597,20 +656,20 @@ export default function DashboardScreen() {
         </View>
 
         {/* Recent Poops - Icon alignment fixed for better visual consistency */}
-        {recentPoops.length > 0 && (
-          <View style={styles.section}>
-            <View style={styles.card}>
-              <View style={styles.dashboardSectionHeader}>
-                <Ionicons 
-                  name="flower" 
-                  size={20} 
-                  color={colors.primary.main} 
-                  style={styles.dashboardSectionIcon}
-                />
-                <Text style={[styles.sectionTitle, { flex: 1 }]}>{t('lastPoops')}</Text>
-              </View>
-              
-              {recentPoops.map((poop, index) => {
+        <View style={styles.section}>
+          <View style={styles.card}>
+            <View style={styles.dashboardSectionHeader}>
+              <Ionicons 
+                name="flower" 
+                size={20} 
+                color={colors.primary.main} 
+                style={styles.dashboardSectionIcon}
+              />
+              <Text style={[styles.sectionTitle, { flex: 1 }]}>{t('lastPoops')}</Text>
+            </View>
+            
+            {recentPoops.length > 0 ? (
+              recentPoops.map((poop, index) => {
                 const poopTime = new Date(poop.time);
                 return (
                   <SwipeableItem
@@ -664,10 +723,15 @@ export default function DashboardScreen() {
                     </View>
                   </SwipeableItem>
                 );
-              })}
-            </View>
+              })
+            ) : (
+              <View style={styles.emptyState}>
+                <Ionicons name="flower-outline" size={48} color={colors.text.secondary} />
+                <Text style={styles.emptyStateText}>{t('noPoops')}</Text>
+              </View>
+            )}
           </View>
-        )}
+        </View>
       </ScrollView>
 
       {/* Edit Bottle Modal - should be outside ScrollView */}

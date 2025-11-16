@@ -96,6 +96,7 @@ class ApiService {
   private baseURL: string = API_CONFIG.BASE_URL;
 
   constructor() {
+    console.log('🔍 [ApiService] Initializing with BASE_URL:', this.baseURL);
     this.api = axios.create({
       baseURL: this.baseURL,
       timeout: 10000,
@@ -107,6 +108,8 @@ class ApiService {
     // Intercepteur pour ajouter le token JWT
     this.api.interceptors.request.use(
       async (config) => {
+        console.log('🔍 [API] Request:', config.method?.toUpperCase(), config.url);
+        console.log('🔍 [API] Full URL:', config.baseURL + config.url);
         const token = await AsyncStorage.getItem('authToken');
         if (token) {
           config.headers.Authorization = `Bearer ${token}`;
@@ -114,14 +117,22 @@ class ApiService {
         return config;
       },
       (error) => {
+        console.error('❌ [API] Request interceptor error:', error);
         return Promise.reject(error);
       }
     );
 
     // Interceptor to handle errors
     this.api.interceptors.response.use(
-      (response) => response,
+      (response) => {
+        console.log('✅ [API] Response:', response.status, response.config.url);
+        return response;
+      },
       (error) => {
+        console.error('❌ [API] Response error:', error.message);
+        console.error('❌ [API] Response error URL:', error.config?.url);
+        console.error('❌ [API] Response error status:', error.response?.status);
+        console.error('❌ [API] Response error data:', error.response?.data);
         if (error.response?.status === 401) {
           // Expired or invalid token
           AsyncStorage.removeItem('authToken');
@@ -134,8 +145,19 @@ class ApiService {
 
   // Authentication methods
   async register(data: RegisterRequest): Promise<AuthResponse> {
-    const response: AxiosResponse<AuthResponse> = await this.api.post('/auth/register', data);
-    return response.data;
+    console.log('🔍 [API] Register request to:', this.baseURL + '/auth/register');
+    console.log('🔍 [API] Register data:', { username: data.username, email: data.email });
+    try {
+      const response: AxiosResponse<AuthResponse> = await this.api.post('/auth/register', data);
+      console.log('✅ [API] Register success:', response.status);
+      return response.data;
+    } catch (error: any) {
+      console.error('❌ [API] Register error:', error.message);
+      console.error('❌ [API] Register error response:', error.response?.data);
+      console.error('❌ [API] Register error status:', error.response?.status);
+      console.error('❌ [API] Full error:', JSON.stringify(error, null, 2));
+      throw error;
+    }
   }
 
   async login(data: LoginRequest): Promise<AuthResponse> {

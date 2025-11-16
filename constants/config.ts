@@ -3,31 +3,40 @@ import Constants from 'expo-constants';
 // Environment-based configuration
 const getApiConfig = () => {
   // Check if we're in development mode
+  
   const isDev = __DEV__ || Constants.expoConfig?.extra?.env === 'development';
   
   // Use environment variable if available (for EAS builds)
   const apiUrl = Constants.expoConfig?.extra?.apiUrl || process.env.EXPO_PUBLIC_API_URL;
   
-  if (apiUrl) {
+  // Check if apiUrl is a valid string
+  if (apiUrl && typeof apiUrl === 'string' && apiUrl.trim() !== '') {
+    const isHttps = apiUrl.startsWith('https');
     return {
       BASE_URL: apiUrl,
-      WS_URL: apiUrl.replace(/^https?/, apiUrl.startsWith('https') ? 'wss' : 'ws').replace('/api', ''),
+      WS_URL: apiUrl.replace(/^https?/, isHttps ? 'wss' : 'ws').replace('/api', ''),
     };
   }
   
-  // Development defaults
-  if (isDev) {
-    return {
-      BASE_URL: 'http://10.100.102.97:3000/api', // Change this to your local dev server
-      WS_URL: 'ws://10.100.102.97:3000',
-    };
-  }
+  // Development defaults - FORCE PRODUCTION FOR TESTING
+  // Comment out the isDev check to always use production
+  // if (isDev) {
+  //   return {
+  //     BASE_URL: 'http://10.100.102.97:3000/api', // Local dev server
+  //     WS_URL: 'ws://10.100.102.97:3000',
+  //   };
+  // }
   
-  // Production defaults - UPDATE THESE WITH YOUR PRODUCTION URL
+  // Production defaults - HTTPS/WSS with Let's Encrypt certificate (Certbot configured)
   return {
-    BASE_URL: 'https://yourdomain.com/api', // TODO: Replace with your production API URL
-    WS_URL: 'wss://yourdomain.com', // TODO: Replace with your production WebSocket URL
+    BASE_URL: 'https://babysip.click/api', // Production API URL (HTTPS with valid SSL certificate)
+    WS_URL: 'wss://babysip.click/ws', // Production WebSocket URL (WSS with valid SSL certificate)
   };
 };
 
 export const API_CONFIG = getApiConfig();
+
+// Debug: Log the API configuration
+console.log('🔍 [API CONFIG] BASE_URL:', API_CONFIG.BASE_URL);
+console.log('🔍 [API CONFIG] WS_URL:', API_CONFIG.WS_URL);
+console.log('🔍 [API CONFIG] __DEV__:', __DEV__);

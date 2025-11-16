@@ -72,6 +72,8 @@ const globalStylesDefinition = {
     textShadowColor: theme.colors.primary.main,
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 3,
+    marginBottom: theme.spacing.md,
+    // transform: [{ translateX: -5 }],
   } as TextStyle,
   
   subtitle: {
@@ -1740,7 +1742,9 @@ const componentStylesDefinition = {
   } as TextStyle,
 
   settingsLogoutButton: {
-    backgroundColor: theme.colors.status.error,
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: theme.colors.status.error,
     paddingVertical: theme.spacing.md,
     paddingHorizontal: theme.spacing.lg,
     borderRadius: theme.borderRadius.sm,
@@ -1750,7 +1754,7 @@ const componentStylesDefinition = {
   } as ViewStyle,
 
   settingsLogoutButtonText: {
-    color: theme.colors.text.inverse,
+    color: theme.colors.status.error,
     fontSize: 16,
     fontWeight: '600',
   } as TextStyle,
@@ -1767,8 +1771,32 @@ const componentStylesDefinition = {
     marginBottom: 8,
   } as ViewStyle,
 
-  dashboardLogoContainer: {
+  dashboardLogoButton: {
     marginRight: 16,
+    marginTop: -5,
+  } as ViewStyle,
+
+  dashboardLogoWrapper: {
+    position: 'relative',
+  } as ViewStyle,
+
+  dashboardLogoContainer: {
+    // Logo styles remain the same
+  } as ViewStyle,
+
+  dashboardSettingsIndicator: {
+    position: 'absolute',
+    bottom: -2,
+    right: -2,
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: theme.colors.background.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: theme.colors.primary.main,
+    ...theme.shadows.xxl,
   } as ViewStyle,
 
   dashboardLoadingSpinner: {
@@ -1777,6 +1805,7 @@ const componentStylesDefinition = {
 
   dashboardTitleContainer: {
     flex: 1,
+    marginLeft: -20,
   } as ViewStyle,
 
   dashboardStatsButton: {

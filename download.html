@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Download BabySip - Android App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #297289 0%, #6366F1 50%, #8B5CF6 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: #FFFFFF;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 100%;
+            padding: 40px;
+            padding-top: 70px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .logo {
+            width: 140px;
+            height: 140px;
+            margin: 0 auto 20px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(41, 114, 137, 0.3);
+        }
+        
+        .logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 30px;
+        }
+        
+        h1 {
+            color: #111827;
+            margin-bottom: 10px;
+            font-size: 36px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        
+        .subtitle {
+            color: #4B5563;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+        
+        .version {
+            background: #F3F4F6;
+            padding: 10px 20px;
+            border-radius: 10px;
+            display: inline-block;
+            margin-bottom: 30px;
+            color: #111827;
+            font-weight: 600;
+        }
+        
+        .download-btn {
+            background: linear-gradient(135deg, #297289 0%, #6366F1 100%);
+            color: white;
+            padding: 18px 40px;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 12px;
+            margin: 20px 0;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 15px rgba(41, 114, 137, 0.4);
+        }
+        
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(41, 114, 137, 0.6);
+        }
+        
+        .download-btn:active {
+            transform: translateY(0);
+        }
+        
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            border-right: none;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 30px 0;
+            text-align: left;
+        }
+        
+        .warning[dir="rtl"] {
+            border-left: none;
+            border-right: 4px solid #ffc107;
+        }
+        
+        .warning h3 {
+            color: #856404;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        
+        .warning ol {
+            margin-left: 20px;
+            margin-right: 0;
+            color: #856404;
+        }
+        
+        .warning[dir="rtl"] ol {
+            margin-left: 0;
+            margin-right: 20px;
+        }
+        
+        .warning li {
+            margin: 10px 0;
+            line-height: 1.6;
+        }
+        
+        h1, .logo {
+            direction: ltr;
+        }
+        
+        .info {
+            background: #E0F2FE;
+            border-left: 4px solid #297289;
+            border-right: none;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: left;
+            color: #0C4A6E;
+        }
+        
+        .info[dir="rtl"] {
+            border-left: none;
+            border-right: 4px solid #297289;
+        }
+        
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #E5E7EB;
+            color: #6B7280;
+            font-size: 14px;
+        }
+        
+        .footer a {
+            color: #297289;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .footer a:hover {
+            text-decoration: underline;
+        }
+        
+        .features {
+            text-align: left;
+            margin: 30px 0;
+        }
+        
+        .features[dir="rtl"] {
+            text-align: right;
+        }
+        
+        .features h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+        
+        .warning[dir="rtl"] {
+            text-align: right;
+        }
+        
+        .info[dir="rtl"] {
+            text-align: right;
+        }
+        
+        .features ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .features li {
+            padding: 8px 0;
+            color: #666;
+        }
+        
+        .features li:before {
+            content: "✓ ";
+            color: #297289;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+        
+        .language-selector {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            left: auto;
+            display: flex;
+            gap: 8px;
+            z-index: 10;
+        }
+        
+        .container[dir="rtl"] .language-selector {
+            right: auto;
+            left: 15px;
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding-top: 80px;
+            }
+            
+            .language-selector {
+                top: 10px;
+                right: 10px;
+                gap: 6px;
+            }
+            
+            .container[dir="rtl"] .language-selector {
+                left: 10px;
+            }
+            
+            .lang-btn {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+        }
+        
+        .lang-btn {
+            padding: 8px 16px;
+            border: 2px solid #297289;
+            background: white;
+            color: #297289;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        
+        .lang-btn:hover {
+            background: #297289;
+            color: white;
+        }
+        
+        .lang-btn.active {
+            background: #297289;
+            color: white;
+        }
+        
+        
+        [data-lang] {
+            display: none;
+        }
+        
+        [data-lang].active {
+            display: block;
+        }
+        
+        [data-lang].active.inline {
+            display: inline;
+        }
+        
+        .footer-links {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            align-items: center;
+        }
+        
+        .footer-links a {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .linkedin-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #0077B5 0%, #005885 100%);
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 119, 181, 0.3);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .linkedin-section:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 119, 181, 0.4);
+        }
+        
+        .linkedin-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: white !important;
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: 600;
+            padding: 12px 24px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            transition: background 0.2s;
+        }
+        
+        .linkedin-link:hover {
+            background: rgba(255, 255, 255, 0.2);
+            text-decoration: none;
+        }
+        
+        .linkedin-icon {
+            font-size: 24px;
+        }
+        
+        .linkedin-text {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .linkedin-section[dir="rtl"] .linkedin-link {
+            direction: rtl;
+        }
+        
+        @media (max-width: 480px) {
+            .linkedin-section {
+                padding: 15px;
+                margin-top: 20px;
+            }
+            
+            .linkedin-link {
+                font-size: 16px;
+                padding: 10px 20px;
+            }
+            
+            .linkedin-icon {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="language-selector">
+            <button class="lang-btn active" onclick="changeLanguage('en')">EN</button>
+            <button class="lang-btn" onclick="changeLanguage('fr')">FR</button>
+            <button class="lang-btn" onclick="changeLanguage('he')">עברית</button>
+        </div>
+        
+        <div class="logo">
+            <img src="/downloads/logo.jpeg" alt="BabySip Logo" />
+        </div>
+        <h1>BabySip</h1>
+        
+        <!-- English -->
+        <p class="subtitle active" data-lang="en">Track your baby's bottles in real-time</p>
+        <!-- French -->
+        <p class="subtitle" data-lang="fr">Suivez les biberons de bébé en temps réel</p>
+        <!-- Hebrew -->
+        <p class="subtitle" data-lang="he" dir="rtl">עקוב אחר בקבוקי התינוק שלך בזמן אמת</p>
+        
+        <div class="version">
+            <span class="active" data-lang="en">Version 1.0.0</span>
+            <span data-lang="fr">Version 1.0.0</span>
+            <span data-lang="he" dir="rtl">גרסה 1.0.0</span>
+        </div>
+        
+        <a href="/downloads/BabySip.apk" class="download-btn" download>
+            <span class="active" data-lang="en">📥 Download Android App</span>
+            <span data-lang="fr">📥 Télécharger l'application Android</span>
+            <span data-lang="he" dir="rtl">📥 הורד אפליקציית אנדרואיד</span>
+        </a>
+        
+        <div class="features">
+            <!-- English -->
+            <div data-lang="en" class="active">
+                <h3>✨ Features</h3>
+                <ul>
+                    <li>Real-time bottle tracking</li>
+                    <li>Sync across multiple devices</li>
+                    <li>Detailed statistics</li>
+                    <li>Intuitive and modern interface</li>
+                    <li>Works offline</li>
+                </ul>
+            </div>
+            <!-- French -->
+            <div data-lang="fr">
+                <h3>✨ Fonctionnalités</h3>
+                <ul>
+                    <li>Suivi des biberons en temps réel</li>
+                    <li>Synchronisation entre plusieurs appareils</li>
+                    <li>Statistiques détaillées</li>
+                    <li>Interface intuitive et moderne</li>
+                    <li>Fonctionne hors ligne</li>
+                </ul>
+            </div>
+            <!-- Hebrew -->
+            <div data-lang="he" dir="rtl">
+                <h3>✨ תכונות</h3>
+                <ul>
+                    <li>מעקב בקבוקים בזמן אמת</li>
+                    <li>סנכרון בין מספר מכשירים</li>
+                    <li>סטטיסטיקות מפורטות</li>
+                    <li>ממשק אינטואיטיבי ומודרני</li>
+                    <li>עובד ללא חיבור לאינטרנט</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="warning">
+            <!-- English -->
+            <div data-lang="en" class="active">
+                <h3>⚠️ Installation Instructions</h3>
+                <ol>
+                    <li><strong>Download the APK</strong> by clicking the button above</li>
+                    <li>Go to <strong>Settings → Security</strong> (or <strong>Settings → Apps</strong> on Android 8+)</li>
+                    <li>Enable <strong>"Unknown sources"</strong> or <strong>"Install unknown apps"</strong></li>
+                    <li>Allow installation from your browser</li>
+                    <li>Open the downloaded file from notifications or the Downloads folder</li>
+                    <li>Follow the on-screen instructions to install</li>
+                </ol>
+            </div>
+            <!-- French -->
+            <div data-lang="fr">
+                <h3>⚠️ Instructions d'installation</h3>
+                <ol>
+                    <li><strong>Téléchargez l'APK</strong> en cliquant sur le bouton ci-dessus</li>
+                    <li>Allez dans <strong>Paramètres → Sécurité</strong> (ou <strong>Paramètres → Applications</strong> sur Android 8+)</li>
+                    <li>Activez <strong>"Sources inconnues"</strong> ou <strong>"Installer des applications inconnues"</strong></li>
+                    <li>Autorisez l'installation depuis votre navigateur</li>
+                    <li>Ouvrez le fichier téléchargé depuis les notifications ou le dossier Téléchargements</li>
+                    <li>Suivez les instructions à l'écran pour installer</li>
+                </ol>
+            </div>
+            <!-- Hebrew -->
+            <div data-lang="he" dir="rtl">
+                <h3>⚠️ הוראות התקנה</h3>
+                <ol>
+                    <li><strong>הורד את ה-APK</strong> על ידי לחיצה על הכפתור למעלה</li>
+                    <li>עבור ל<strong>הגדרות → אבטחה</strong> (או <strong>הגדרות → אפליקציות</strong> באנדרואיד 8+)</li>
+                    <li>הפעל <strong>"מקורות לא ידועים"</strong> או <strong>"התקן אפליקציות לא ידועות"</strong></li>
+                    <li>אפשר התקנה מהדפדפן שלך</li>
+                    <li>פתח את הקובץ שהורד מההתראות או מתיקיית ההורדות</li>
+                    <li>עקוב אחר ההוראות על המסך להתקנה</li>
+                </ol>
+            </div>
+        </div>
+        
+        <div class="info">
+            <!-- English -->
+            <div data-lang="en" class="active">
+                <strong>💡 Tip:</strong> After installation, you can disable "Unknown sources" for added security.
+            </div>
+            <!-- French -->
+            <div data-lang="fr">
+                <strong>💡 Astuce :</strong> Après l'installation, vous pouvez désactiver "Sources inconnues" pour plus de sécurité.
+            </div>
+            <!-- Hebrew -->
+            <div data-lang="he" dir="rtl">
+                <strong>💡 טיפ:</strong> לאחר ההתקנה, תוכל להשבית "מקורות לא ידועים" לאבטחה נוספת.
+            </div>
+        </div>
+        
+        <div class="linkedin-section">
+            <a href="https://www.linkedin.com/in/ichai-simah-498687270/" target="_blank" rel="noopener noreferrer" class="linkedin-link">
+                <span class="linkedin-icon">💼</span>
+                <span class="linkedin-text">
+                    <span class="active" data-lang="en">Connect with me on LinkedIn</span>
+                    <span data-lang="fr">Connectez-vous avec moi sur LinkedIn</span>
+                    <span data-lang="he" dir="rtl">התחבר איתי בלינקדאין</span>
+                </span>
+            </a>
+        </div>
+        
+        <div class="footer">
+            <div class="footer-links">
+                <p>
+                    <span class="active" data-lang="en">Developed with ❤️ for parents</span>
+                    <span data-lang="fr">Développé avec ❤️ pour les parents</span>
+                    <span data-lang="he" dir="rtl">פותח באהבה ❤️ להורים</span>
+                </p>
+                <p style="margin-top: 10px;">
+                    <a href="https://babysip.click">babysip.click</a>
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Language data
+        const translations = {
+            en: {
+                title: 'Download BabySip - Android App',
+                subtitle: 'Track your baby\'s bottles in real-time',
+                version: 'Version 1.0.0',
+                downloadBtn: '📥 Download Android App',
+                features: '✨ Features',
+                feature1: 'Real-time bottle tracking',
+                feature2: 'Sync across multiple devices',
+                feature3: 'Detailed statistics',
+                feature4: 'Intuitive and modern interface',
+                feature5: 'Works offline',
+                installTitle: '⚠️ Installation Instructions',
+                install1: 'Download the APK by clicking the button above',
+                install2: 'Go to Settings → Security (or Settings → Apps on Android 8+)',
+                install3: 'Enable "Unknown sources" or "Install unknown apps"',
+                install4: 'Allow installation from your browser',
+                install5: 'Open the downloaded file from notifications or the Downloads folder',
+                install6: 'Follow the on-screen instructions to install',
+                tip: 'Tip: After installation, you can disable "Unknown sources" for added security.',
+                footer: 'Developed with ❤️ for parents',
+                linkedin: '🔗 LinkedIn'
+            },
+            fr: {
+                title: 'Télécharger BabySip - Application Android',
+                subtitle: 'Suivez les biberons de bébé en temps réel',
+                version: 'Version 1.0.0',
+                downloadBtn: '📥 Télécharger l\'application Android',
+                features: '✨ Fonctionnalités',
+                feature1: 'Suivi des biberons en temps réel',
+                feature2: 'Synchronisation entre plusieurs appareils',
+                feature3: 'Statistiques détaillées',
+                feature4: 'Interface intuitive et moderne',
+                feature5: 'Fonctionne hors ligne',
+                installTitle: '⚠️ Instructions d\'installation',
+                install1: 'Téléchargez l\'APK en cliquant sur le bouton ci-dessus',
+                install2: 'Allez dans Paramètres → Sécurité (ou Paramètres → Applications sur Android 8+)',
+                install3: 'Activez "Sources inconnues" ou "Installer des applications inconnues"',
+                install4: 'Autorisez l\'installation depuis votre navigateur',
+                install5: 'Ouvrez le fichier téléchargé depuis les notifications ou le dossier Téléchargements',
+                install6: 'Suivez les instructions à l\'écran pour installer',
+                tip: 'Astuce : Après l\'installation, vous pouvez désactiver "Sources inconnues" pour plus de sécurité.',
+                footer: 'Développé avec ❤️ pour les parents',
+                linkedin: '🔗 LinkedIn'
+            },
+            he: {
+                title: 'הורד BabySip - אפליקציית אנדרואיד',
+                subtitle: 'עקוב אחר בקבוקי התינוק שלך בזמן אמת',
+                version: 'גרסה 1.0.0',
+                downloadBtn: '📥 הורד אפליקציית אנדרואיד',
+                features: '✨ תכונות',
+                feature1: 'מעקב בקבוקים בזמן אמת',
+                feature2: 'סנכרון בין מספר מכשירים',
+                feature3: 'סטטיסטיקות מפורטות',
+                feature4: 'ממשק אינטואיטיבי ומודרני',
+                feature5: 'עובד ללא חיבור לאינטרנט',
+                installTitle: '⚠️ הוראות התקנה',
+                install1: 'הורד את ה-APK על ידי לחיצה על הכפתור למעלה',
+                install2: 'עבור להגדרות → אבטחה (או הגדרות → אפליקציות באנדרואיד 8+)',
+                install3: 'הפעל "מקורות לא ידועים" או "התקן אפליקציות לא ידועות"',
+                install4: 'אפשר התקנה מהדפדפן שלך',
+                install5: 'פתח את הקובץ שהורד מההתראות או מתיקיית ההורדות',
+                install6: 'עקוב אחר ההוראות על המסך להתקנה',
+                tip: 'טיפ: לאחר ההתקנה, תוכל להשבית "מקורות לא ידועים" לאבטחה נוספת.',
+                footer: 'פותח באהבה ❤️ להורים',
+                linkedin: '🔗 לינקדאין'
+            }
+        };
+        
+        // Change language function
+        function changeLanguage(lang) {
+            // Update active button
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.textContent === 'EN' && lang === 'en') {
+                    btn.classList.add('active');
+                } else if (btn.textContent === 'FR' && lang === 'fr') {
+                    btn.classList.add('active');
+                } else if (btn.textContent === 'עברית' && lang === 'he') {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // Update HTML lang attribute
+            document.documentElement.lang = lang;
+            document.documentElement.dir = lang === 'he' ? 'rtl' : 'ltr';
+            
+            // Update body direction for RTL
+            if (lang === 'he') {
+                document.body.style.direction = 'rtl';
+                document.querySelector('.container').style.direction = 'rtl';
+            } else {
+                document.body.style.direction = 'ltr';
+                document.querySelector('.container').style.direction = 'ltr';
+            }
+            
+            // Show/hide language-specific content
+            document.querySelectorAll('[data-lang]').forEach(el => {
+                el.classList.remove('active', 'inline');
+                if (el.getAttribute('data-lang') === lang) {
+                    el.classList.add('active');
+                    if (el.tagName === 'SPAN') {
+                        el.classList.add('inline');
+                    }
+                }
+            });
+            
+            // Update parent containers direction for RTL
+            const featuresDiv = document.querySelector('.features');
+            const warningDiv = document.querySelector('.warning');
+            const infoDiv = document.querySelector('.info');
+            
+            if (lang === 'he') {
+                if (featuresDiv) featuresDiv.style.direction = 'rtl';
+                if (warningDiv) warningDiv.style.direction = 'rtl';
+                if (infoDiv) infoDiv.style.direction = 'rtl';
+            } else {
+                if (featuresDiv) featuresDiv.style.direction = 'ltr';
+                if (warningDiv) warningDiv.style.direction = 'ltr';
+                if (infoDiv) infoDiv.style.direction = 'ltr';
+            }
+            
+            // Update title
+            document.title = translations[lang].title;
+            
+            // Save preference
+            localStorage.setItem('preferredLanguage', lang);
+        }
+        
+        // Load saved language preference
+        window.addEventListener('DOMContentLoaded', function() {
+            const savedLang = localStorage.getItem('preferredLanguage') || 'en';
+            let langBtn;
+            if (savedLang === 'he') {
+                langBtn = document.querySelectorAll('.lang-btn')[2];
+            } else if (savedLang === 'fr') {
+                langBtn = document.querySelectorAll('.lang-btn')[1];
+            } else {
+                langBtn = document.querySelectorAll('.lang-btn')[0];
+            }
+            if (langBtn) {
+                langBtn.click();
+            }
+        });
+    </script>
+</body>
+</html>
+

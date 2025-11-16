@@ -88,7 +88,6 @@ export default function AddPoopScreen() {
   const addPoop = async () => {
     if (!groupId) {
       setGroupId(1);
-      return;
     }
 
     try {
@@ -202,7 +201,7 @@ export default function AddPoopScreen() {
             <Text style={[styles.modalAmountDisplayText, { color: colors.text.inverse }]}>
               {getRelativeDateString(selectedDateTime, language)}
             </Text>
-            <Text style={styles.addPoopTimeDisplayLabel}>{t('clickToChange')}</Text>
+            <Text style={styles.addPoopTimeDisplayLabel}>{t('tapToChange')}</Text>
           </TouchableOpacity>
           
           {showDatePicker && (

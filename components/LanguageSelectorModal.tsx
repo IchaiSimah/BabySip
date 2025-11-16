@@ -29,13 +29,13 @@ const languages = [
   },
   {
     code: 'fr' as Language,
-    name: 'Français',
+    name: 'French',
     flag: '🇫🇷',
     nativeName: 'Français',
   },
   {
     code: 'he' as Language,
-    name: 'עברית',
+    name: 'Hebrew',
     flag: '🇮🇱',
     nativeName: 'עברית',
   },
@@ -115,7 +115,7 @@ export default function LanguageSelectorModal({ visible, onClose }: LanguageSele
                         language === lang.code && styles.languageSelectorSelectedLanguageName,
                       ]}
                     >
-                      {lang.nativeName}
+                      {t(lang.name)}
                     </Text>
                     <Text
                       style={[
@@ -123,7 +123,7 @@ export default function LanguageSelectorModal({ visible, onClose }: LanguageSele
                         language === lang.code && styles.languageSelectorSelectedLanguageCode,
                       ]}
                     >
-                      {lang.name}
+                      {lang.nativeName}
                     </Text>
                   </View>
                   {language === lang.code && (

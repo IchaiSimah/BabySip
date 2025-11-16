@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BabySip - Baby Bottle Tracker App</title>
+    <meta name="description" content="Professional baby bottle tracking application with real-time synchronization across devices">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f8fafc;
+            color: #1e293b;
+            line-height: 1.6;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: white;
+            padding: 2rem 1rem;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .logo {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            object-fit: cover;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .app-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin: 0;
+        }
+        
+        .app-tagline {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-top: 0.25rem;
+        }
+        
+        .language-selector {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .lang-btn {
+            padding: 0.5rem 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .lang-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .lang-btn.active {
+            background: white;
+            color: #0f172a;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 3rem 1.5rem;
+        }
+        
+        .hero-section {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+        
+        .hero-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #0f172a;
+        }
+        
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: #64748b;
+            margin-bottom: 2rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .download-card {
+            background: white;
+            border-radius: 16px;
+            padding: 2.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05), 0 10px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 3rem;
+            text-align: center;
+        }
+        
+        .version-badge {
+            display: inline-block;
+            background: #e0f2fe;
+            color: #0369a1;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+        }
+        
+        .download-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            color: white;
+            padding: 1rem 2rem;
+            font-size: 1.125rem;
+            font-weight: 600;
+            border-radius: 12px;
+            text-decoration: none;
+            box-shadow: 0 4px 6px rgba(37, 99, 235, 0.3);
+            transition: all 0.2s;
+            margin: 1rem 0;
+        }
+        
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(37, 99, 235, 0.4);
+        }
+        
+        .download-btn:active {
+            transform: translateY(0);
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        
+        .feature-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+        
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .feature-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: #0f172a;
+        }
+        
+        .feature-description {
+            color: #64748b;
+            line-height: 1.6;
+        }
+        
+        .info-section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        .info-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .info-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .info-list li {
+            padding: 1rem 0;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: start;
+            gap: 1rem;
+        }
+        
+        .info-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .info-number {
+            background: #2563eb;
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.875rem;
+            flex-shrink: 0;
+        }
+        
+        .info-text {
+            flex: 1;
+            color: #475569;
+        }
+        
+        .info-text strong {
+            color: #0f172a;
+        }
+        
+        .security-badge {
+            background: #f0fdf4;
+            border: 1px solid #86efac;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .security-badge-text {
+            color: #166534;
+            font-size: 0.875rem;
+        }
+        
+        .footer {
+            background: #0f172a;
+            color: white;
+            padding: 3rem 1.5rem;
+            margin-top: 4rem;
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+        
+        .footer-section h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        .footer-section p,
+        .footer-section a {
+            color: #cbd5e1;
+            text-decoration: none;
+            font-size: 0.875rem;
+            line-height: 1.8;
+        }
+        
+        .footer-section a:hover {
+            color: white;
+        }
+        
+        .linkedin-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #60a5fa;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        
+        .linkedin-link:hover {
+            color: #93c5fd;
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 2rem;
+            margin-top: 2rem;
+            border-top: 1px solid #334155;
+            color: #94a3b8;
+            font-size: 0.875rem;
+        }
+        
+        [data-lang] {
+            display: none;
+        }
+        
+        [data-lang].active {
+            display: block;
+        }
+        
+        [data-lang].active.inline {
+            display: inline;
+        }
+        
+        [dir="rtl"] {
+            direction: rtl;
+            text-align: right;
+        }
+        
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1.125rem;
+            }
+            
+            .download-card {
+                padding: 1.5rem;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-section">
+                <img src="/downloads/logo.jpeg" alt="BabySip Logo" class="logo" />
+                <div>
+                    <h1 class="app-title">BabySip</h1>
+                    <p class="app-tagline">
+                        <span class="active" data-lang="en">Professional Baby Bottle Tracking</span>
+                        <span data-lang="fr">Suivi Professionnel des Biberons</span>
+                        <span data-lang="he" dir="rtl">מעקב מקצועי אחר בקבוקים</span>
+                    </p>
+                </div>
+            </div>
+            <div class="language-selector">
+                <button class="lang-btn active" onclick="changeLanguage('en')">EN</button>
+                <button class="lang-btn" onclick="changeLanguage('fr')">FR</button>
+                <button class="lang-btn" onclick="changeLanguage('he')">עברית</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="hero-section">
+            <h2 class="hero-title">
+                <span class="active" data-lang="en">Track Your Baby's Feeding Schedule</span>
+                <span data-lang="fr">Suivez le Planning d'Alimentation de Bébé</span>
+                <span data-lang="he" dir="rtl">עקוב אחר לוח הזנת התינוק</span>
+            </h2>
+            <p class="hero-subtitle">
+                <span class="active" data-lang="en">A reliable mobile application for parents to monitor bottle feeding times, amounts, and sync data across multiple devices in real-time.</span>
+                <span data-lang="fr">Une application mobile fiable pour les parents afin de surveiller les heures de biberon, les quantités et synchroniser les données entre plusieurs appareils en temps réel.</span>
+                <span data-lang="he" dir="rtl">אפליקציה ניידת אמינה להורים למעקב אחר זמני האכלה, כמויות וסנכרון נתונים בין מספר מכשירים בזמן אמת.</span>
+            </p>
+        </section>
+
+        <section class="download-card">
+            <div class="version-badge">
+                <span class="active" data-lang="en">Version 1.0.0</span>
+                <span data-lang="fr">Version 1.0.0</span>
+                <span data-lang="he" dir="rtl">גרסה 1.0.0</span>
+            </div>
+            <a href="/downloads/BabySip.apk" class="download-btn" download>
+                <span>📥</span>
+                <span>
+                    <span class="active" data-lang="en">Download for Android</span>
+                    <span data-lang="fr">Télécharger pour Android</span>
+                    <span data-lang="he" dir="rtl">הורדה לאנדרואיד</span>
+                </span>
+            </a>
+            <p style="margin-top: 1rem; color: #64748b; font-size: 0.875rem;">
+                <span class="active" data-lang="en">APK file • Safe and secure</span>
+                <span data-lang="fr">Fichier APK • Sûr et sécurisé</span>
+                <span data-lang="he" dir="rtl">קובץ APK • בטוח ומאובטח</span>
+            </p>
+        </section>
+
+        <section class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3 class="feature-title">
+                    <span class="active" data-lang="en">Real-Time Tracking</span>
+                    <span data-lang="fr">Suivi en Temps Réel</span>
+                    <span data-lang="he" dir="rtl">מעקב בזמן אמת</span>
+                </h3>
+                <p class="feature-description">
+                    <span class="active" data-lang="en">Monitor feeding times and amounts instantly with an intuitive interface.</span>
+                    <span data-lang="fr">Surveillez les heures et quantités d'alimentation instantanément avec une interface intuitive.</span>
+                    <span data-lang="he" dir="rtl">עקוב אחר זמני האכלה וכמויות באופן מיידי עם ממשק אינטואיטיבי.</span>
+                </p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔄</div>
+                <h3 class="feature-title">
+                    <span class="active" data-lang="en">Multi-Device Sync</span>
+                    <span data-lang="fr">Synchronisation Multi-Appareils</span>
+                    <span data-lang="he" dir="rtl">סנכרון רב-מכשירים</span>
+                </h3>
+                <p class="feature-description">
+                    <span class="active" data-lang="en">Keep your data synchronized across all your devices automatically.</span>
+                    <span data-lang="fr">Gardez vos données synchronisées sur tous vos appareils automatiquement.</span>
+                    <span data-lang="he" dir="rtl">שמור על סנכרון הנתונים שלך בכל המכשירים שלך אוטומטית.</span>
+                </p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📈</div>
+                <h3 class="feature-title">
+                    <span class="active" data-lang="en">Detailed Statistics</span>
+                    <span data-lang="fr">Statistiques Détaillées</span>
+                    <span data-lang="he" dir="rtl">סטטיסטיקות מפורטות</span>
+                </h3>
+                <p class="feature-description">
+                    <span class="active" data-lang="en">View comprehensive feeding patterns and insights.</span>
+                    <span data-lang="fr">Consultez des modèles d'alimentation complets et des analyses.</span>
+                    <span data-lang="he" dir="rtl">צפה בדפוסי האכלה ותובנות מקיפים.</span>
+                </p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📱</div>
+                <h3 class="feature-title">
+                    <span class="active" data-lang="en">Offline Support</span>
+                    <span data-lang="fr">Support Hors Ligne</span>
+                    <span data-lang="he" dir="rtl">תמיכה במצב לא מקוון</span>
+                </h3>
+                <p class="feature-description">
+                    <span class="active" data-lang="en">Works seamlessly even without internet connection.</span>
+                    <span data-lang="fr">Fonctionne parfaitement même sans connexion Internet.</span>
+                    <span data-lang="he" dir="rtl">עובד בצורה חלקה גם ללא חיבור לאינטרנט.</span>
+                </p>
+            </div>
+        </section>
+
+        <section class="info-section">
+            <h3 class="info-title">
+                <span>📋</span>
+                <span>
+                    <span class="active" data-lang="en">Installation Instructions</span>
+                    <span data-lang="fr">Instructions d'Installation</span>
+                    <span data-lang="he" dir="rtl">הוראות התקנה</span>
+                </span>
+            </h3>
+            <ol class="info-list">
+                <li>
+                    <span class="info-number">1</span>
+                    <div class="info-text">
+                        <span class="active" data-lang="en"><strong>Download the APK</strong> file by clicking the download button above.</span>
+                        <span data-lang="fr"><strong>Téléchargez le fichier APK</strong> en cliquant sur le bouton de téléchargement ci-dessus.</span>
+                        <span data-lang="he" dir="rtl"><strong>הורד את קובץ ה-APK</strong> על ידי לחיצה על כפתור ההורדה למעלה.</span>
+                    </div>
+                </li>
+                <li>
+                    <span class="info-number">2</span>
+                    <div class="info-text">
+                        <span class="active" data-lang="en">Open <strong>Settings</strong> on your Android device, then navigate to <strong>Security</strong> (or <strong>Apps</strong> on Android 8+).</span>
+                        <span data-lang="fr">Ouvrez <strong>Paramètres</strong> sur votre appareil Android, puis accédez à <strong>Sécurité</strong> (ou <strong>Applications</strong> sur Android 8+).</span>
+                        <span data-lang="he" dir="rtl">פתח <strong>הגדרות</strong> במכשיר האנדרואיד שלך, ואז עבור ל<strong>אבטחה</strong> (או <strong>אפליקציות</strong> באנדרואיד 8+).</span>
+                    </div>
+                </li>
+                <li>
+                    <span class="info-number">3</span>
+                    <div class="info-text">
+                        <span class="active" data-lang="en">Enable <strong>"Unknown sources"</strong> or <strong>"Install unknown apps"</strong> option for your browser.</span>
+                        <span data-lang="fr">Activez l'option <strong>"Sources inconnues"</strong> ou <strong>"Installer des applications inconnues"</strong> pour votre navigateur.</span>
+                        <span data-lang="he" dir="rtl">הפעל את האפשרות <strong>"מקורות לא ידועים"</strong> או <strong>"התקן אפליקציות לא ידועות"</strong> עבור הדפדפן שלך.</span>
+                    </div>
+                </li>
+                <li>
+                    <span class="info-number">4</span>
+                    <div class="info-text">
+                        <span class="active" data-lang="en">Locate the downloaded APK file in your <strong>Downloads</strong> folder or notification panel.</span>
+                        <span data-lang="fr">Localisez le fichier APK téléchargé dans votre dossier <strong>Téléchargements</strong> ou panneau de notifications.</span>
+                        <span data-lang="he" dir="rtl">אתר את קובץ ה-APK שהורד בתיקיית <strong>הורדות</strong> שלך או בלוח ההתראות.</span>
+                    </div>
+                </li>
+                <li>
+                    <span class="info-number">5</span>
+                    <div class="info-text">
+                        <span class="active" data-lang="en">Tap the APK file and follow the on-screen prompts to complete the installation.</span>
+                        <span data-lang="fr">Appuyez sur le fichier APK et suivez les invites à l'écran pour terminer l'installation.</span>
+                        <span data-lang="he" dir="rtl">הקש על קובץ ה-APK ועקוב אחר ההוראות על המסך כדי להשלים את ההתקנה.</span>
+                    </div>
+                </li>
+            </ol>
+            <div class="security-badge">
+                <span>🔒</span>
+                <p class="security-badge-text">
+                    <span class="active" data-lang="en"><strong>Security Note:</strong> You can disable "Unknown sources" after installation for enhanced security.</span>
+                    <span data-lang="fr"><strong>Note de Sécurité :</strong> Vous pouvez désactiver "Sources inconnues" après l'installation pour une sécurité renforcée.</span>
+                    <span data-lang="he" dir="rtl"><strong>הערת אבטחה:</strong> תוכל להשבית "מקורות לא ידועים" לאחר ההתקנה לאבטחה משופרת.</span>
+                </p>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>
+                    <span class="active" data-lang="en">About BabySip</span>
+                    <span data-lang="fr">À Propos de BabySip</span>
+                    <span data-lang="he" dir="rtl">אודות BabySip</span>
+                </h3>
+                <p>
+                    <span class="active" data-lang="en">A professional baby bottle tracking application designed to help parents monitor and manage their baby's feeding schedule with ease.</span>
+                    <span data-lang="fr">Une application professionnelle de suivi des biberons conçue pour aider les parents à surveiller et gérer le planning d'alimentation de leur bébé en toute simplicité.</span>
+                    <span data-lang="he" dir="rtl">אפליקציית מעקב מקצועית לבקבוקים שתוכננה לעזור להורים לעקוב ולנהל את לוח הזנת התינוק שלהם בקלות.</span>
+                </p>
+            </div>
+            <div class="footer-section">
+                <h3>
+                    <span class="active" data-lang="en">Contact</span>
+                    <span data-lang="fr">Contact</span>
+                    <span data-lang="he" dir="rtl">יצירת קשר</span>
+                </h3>
+                <p>
+                    <a href="https://babysip.click" class="linkedin-link">babysip.click</a>
+                </p>
+                <p style="margin-top: 0.75rem;">
+                    <a href="https://www.linkedin.com/in/ichai-simah-498687270/" target="_blank" rel="noopener noreferrer" class="linkedin-link">
+                        <span>💼</span>
+                        <span>
+                            <span class="active" data-lang="en">Connect on LinkedIn</span>
+                            <span data-lang="fr">Se connecter sur LinkedIn</span>
+                            <span data-lang="he" dir="rtl">התחבר בלינקדאין</span>
+                        </span>
+                    </a>
+                </p>
+            </div>
+            <div class="footer-section">
+                <h3>
+                    <span class="active" data-lang="en">Support</span>
+                    <span data-lang="fr">Support</span>
+                    <span data-lang="he" dir="rtl">תמיכה</span>
+                </h3>
+                <p>
+                    <span class="active" data-lang="en">For questions or support, please contact us through our website or LinkedIn profile.</span>
+                    <span data-lang="fr">Pour des questions ou un support, veuillez nous contacter via notre site web ou profil LinkedIn.</span>
+                    <span data-lang="he" dir="rtl">לשאלות או תמיכה, אנא צור קשר דרך האתר שלנו או פרופיל הלינקדאין.</span>
+                </p>
+            </div>
+        </div>
+        <div class="copyright">
+            <p>
+                <span class="active" data-lang="en">© 2024 BabySip. All rights reserved. Developed with ❤️ for parents.</span>
+                <span data-lang="fr">© 2024 BabySip. Tous droits réservés. Développé avec ❤️ pour les parents.</span>
+                <span data-lang="he" dir="rtl">© 2024 BabySip. כל הזכויות שמורות. פותח באהבה ❤️ להורים.</span>
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        function changeLanguage(lang) {
+            // Update active button
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.textContent === 'EN' && lang === 'en') {
+                    btn.classList.add('active');
+                } else if (btn.textContent === 'FR' && lang === 'fr') {
+                    btn.classList.add('active');
+                } else if (btn.textContent === 'עברית' && lang === 'he') {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // Update HTML lang and dir attributes
+            document.documentElement.lang = lang;
+            document.documentElement.dir = lang === 'he' ? 'rtl' : 'ltr';
+            
+            // Update body direction
+            document.body.style.direction = lang === 'he' ? 'rtl' : 'ltr';
+            
+            // Show/hide language-specific content
+            document.querySelectorAll('[data-lang]').forEach(el => {
+                el.classList.remove('active', 'inline');
+                if (el.getAttribute('data-lang') === lang) {
+                    el.classList.add('active');
+                    if (el.tagName === 'SPAN') {
+                        el.classList.add('inline');
+                    }
+                }
+            });
+            
+            // Update title
+            const titles = {
+                en: 'BabySip - Baby Bottle Tracker App',
+                fr: 'BabySip - Application de Suivi des Biberons',
+                he: 'BabySip - אפליקציית מעקב בקבוקים'
+            };
+            document.title = titles[lang] || titles.en;
+            
+            // Save preference
+            localStorage.setItem('preferredLanguage', lang);
+        }
+        
+        // Load saved language preference
+        window.addEventListener('DOMContentLoaded', function() {
+            const savedLang = localStorage.getItem('preferredLanguage') || 'en';
+            let langBtn;
+            if (savedLang === 'he') {
+                langBtn = document.querySelectorAll('.lang-btn')[2];
+            } else if (savedLang === 'fr') {
+                langBtn = document.querySelectorAll('.lang-btn')[1];
+            } else {
+                langBtn = document.querySelectorAll('.lang-btn')[0];
+            }
+            if (langBtn) {
+                langBtn.click();
+            }
+        });
+    </script>
+</body>
+</html>
+
+
